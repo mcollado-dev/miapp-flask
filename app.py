@@ -6,11 +6,20 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
-@app.route('/detalles')
-def detalles():
-    return render_template('detalles.html')
+@app.route('/estadisticas')
+def estadisticas():
+    return render_template('estadisticas.html')
+
+@app.route('/funciones')
+def funciones():
+    return render_template('funciones.html')
+
+@app.route('/documentacion')
+def documentacion():
+    return render_template('documentacion.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
+
 
 
