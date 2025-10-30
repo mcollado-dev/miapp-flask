@@ -2,11 +2,17 @@
 
 {% block content %}
 <div class="text-center mt-5">
-    <h1 class="display-5 fw-bold text-primary">¡Hola desde Flask y Jenkins!</h1>
+    <h1 class="display-5 fw-bold text-primary">¡Bienvenido a Mi App Flask!</h1>
     <p class="lead mt-3">
-        Esta es una app Flask real desplegada automáticamente en Docker.<br>
-        ¡Todo el pipeline funciona perfectamente!
+        Esta aplicación demuestra un despliegue automatizado con Flask, Docker y Jenkins.<br>
+        Usa las opciones de abajo para navegar entre las distintas secciones.
     </p>
-    <a href="{{ url_for('detalles') }}" class="btn btn-success mt-4">Ver detalles</a>
+
+    <div class="d-flex justify-content-center flex-wrap gap-3 mt-4">
+        <a href="{{ url_for('estadisticas') }}" class="btn btn-outline-primary btn-lg">Estadísticas</a>
+        <a href="{{ url_for('funciones') }}" class="btn btn-outline-success btn-lg">Funciones</a>
+        <a href="{{ url_for('documentacion') }}" class="btn btn-outline-warning btn-lg">Documentación</a>
+    </div>
 </div>
 {% endblock %}
+
