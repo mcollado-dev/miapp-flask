@@ -7,6 +7,8 @@ pipeline {
         DEPLOY_HOST     = '192.168.56.106'
         APP_PORT        = '8081'      // Puerto del host
         CONTAINER_PORT  = '80'        // Puerto interno del contenedor
+        SONAR_HOST_URL  = 'http://192.168.56.100:9000'  // Cambia según tu SonarQube
+        SONAR_AUTH_TOKEN= credentials('sonar-token')     // Token guardado en Jenkins
     }
 
     stages {
@@ -14,6 +16,24 @@ pipeline {
             steps {
                 echo 'Clonando repositorio...'
                 checkout scm
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                echo 'Ejecutando análisis SonarQube...'
+                withSonarQubeEnv('SonarQube-Local') {
+                    script {
+                        def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                                -Dsonar.projectKey=${APP_NAME} \
+                                -Dsonar.sources=. \
+                                -Dsonar.host.url=${SONAR_HOST_URL} \
+                                -Dsonar.login=${SONAR_AUTH_TOKEN}
+                        """
+                    }
+                }
             }
         }
 
@@ -38,7 +58,7 @@ pipeline {
             }
         }
 
-        stage('Verify Deployment') {
+        stage('Verificar Despliegue') {
             steps {
                 echo 'Verificando que la app responde...'
                 sh """
@@ -55,14 +75,23 @@ pipeline {
                 """
             }
         }
+
+        stage('Quality Gate') {
+            steps {
+                echo 'Esperando resultado del Quality Gate de SonarQube...'
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
     }
 
     post {
         success {
-            echo 'Despliegue completado correctamente.'
+            echo 'Pipeline completado correctamente: SonarQube y despliegue OK.'
         }
         failure {
-            echo 'Falló el despliegue. Revisa los logs.'
+            echo 'Falló el pipeline. Revisa los logs.'
         }
     }
 }
