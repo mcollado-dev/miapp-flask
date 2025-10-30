@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center mt-5">
+    <h1 class="display-5 fw-bold text-primary mb-4">Página de Detalles</h1>
+    <p class="lead mb-5">
+        Aquí puedes ver información detallada sobre tu aplicación y sus características.
+    </p>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Estadísticas</h5>
+                    <p class="card-text">
+                        Visualiza métricas importantes de la aplicación, como número de usuarios y actividad reciente.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Funciones</h5>
+                    <p class="card-text">
+                        Descubre las funcionalidades principales y cómo aprovecharlas al máximo.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Documentación</h5>
+                    <p class="card-text">
+                        Consulta la documentación técnica y ejemplos de uso de la app.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <a href="{{ url_for('home') }}" class="btn btn-secondary">Volver al inicio</a>
+    </div>
+</div>
+{% endblock %}
