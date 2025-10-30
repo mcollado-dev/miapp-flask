@@ -2,9 +2,11 @@ pipeline {
     agent { label 'debian-agent' }
 
     environment {
-        APP_NAME = 'miapp-flask'
+        APP_NAME    = 'miapp-flask'
         DEPLOY_USER = 'manuelcollado'
         DEPLOY_HOST = '192.168.56.106'
+        APP_PORT    = '8081'  // Puerto del host donde se expondrá Flask
+        CONTAINER_PORT = '80' // Puerto interno del contenedor Flask
     }
 
     stages {
@@ -27,13 +29,13 @@ pipeline {
         stage('Deploy Flask App') {
             steps {
                 echo "Desplegando aplicación Flask en ${DEPLOY_HOST}..."
+                // Enviamos la imagen, eliminamos contenedor anterior y lanzamos uno nuevo
                 sh """
                     docker save ${APP_NAME}:latest | bzip2 | \
-                    ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} 'bunzip2 | docker load'
-
                     ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
+                        bunzip2 | docker load
                         docker rm -f ${APP_NAME} || true
-                        docker run -d -p 8081:80 --name ${APP_NAME} ${APP_NAME}:latest
+                        docker run -d -p ${APP_PORT}:${CONTAINER_PORT} --name ${APP_NAME} ${APP_NAME}:latest
                     '
                 """
             }
@@ -43,7 +45,15 @@ pipeline {
             steps {
                 echo 'Verificando que la app responde...'
                 sh """
-                    ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} 'curl -I http://localhost:8081 | grep "200 OK"'
+                    ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
+                        STATUS=\$(curl -s -o /dev/null -w "%{http_code}" http://localhost:${APP_PORT})
+                        if [ "\$STATUS" -eq 200 ]; then
+                            echo "App Flask corriendo correctamente"
+                        else
+                            echo "Error: App Flask no responde (HTTP \$STATUS)"
+                            exit 1
+                        fi
+                    '
                 """
             }
         }
