@@ -5,3 +5,13 @@ body {
 h1 {
     color: #0d6efd;
 }
+
+/* Cards con sombra más definida */
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
