@@ -1,9 +1,11 @@
-from flask import Flask
+from flask import Flask, render_template
+
 app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return '<h1>¡Hola desde Flask y Jenkins!</h1><p>Esta es una app real desplegada con Docker.</p>'
+    return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
+
