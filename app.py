@@ -9,39 +9,25 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-# Inicializar la base de datos al arrancar la app
+# Inicializar la base de datos y añadir un usuario de ejemplo si está vacía
 with app.app_context():
     db.create_all()
     if Usuario.query.count() == 0:
-        # Añadir usuarios de ejemplo
-        usuarios = [
-            Usuario(nombre='Manuel Collado', email='manuel@example.com', rol='Administrador'),
-            Usuario(nombre='Laura Pérez', email='laura@example.com', rol='Editor'),
-            Usuario(nombre='Carlos Gómez', email='carlos@example.com', rol='Lector')
-        ]
-        db.session.add_all(usuarios)
+        demo_user = Usuario(nombre="Admin", email="admin@example.com", rol="Administrador")
+        db.session.add(demo_user)
         db.session.commit()
 
-# Rutas de la aplicación
+# Rutas
 @app.route('/')
 def home():
     return render_template('index.html')
 
 @app.route('/estadisticas')
 def estadisticas():
+    # Ejemplo: puedes calcular estadísticas reales aquí
     usuarios = Usuario.query.all()
-    meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"]
-    registros = [3, 5, 2, 8, 4, 6]
-    roles_count = {
-        "Administradores": Usuario.query.filter_by(rol='Administrador').count(),
-        "Editores": Usuario.query.filter_by(rol='Editor').count(),
-        "Lectores": Usuario.query.filter_by(rol='Lector').count()
-    }
-    return render_template('estadisticas.html',
-                           usuarios=usuarios,
-                           labels=meses,
-                           data=registros,
-                           roles=roles_count)
+    total_usuarios = len(usuarios)
+    return render_template('estadisticas.html', total_usuarios=total_usuarios, usuarios=usuarios)
 
 @app.route('/funciones')
 def funciones():
@@ -52,6 +38,5 @@ def documentacion():
     return render_template('documentacion.html')
 
 if __name__ == '__main__':
-    # Escuchar en todas las interfaces para Docker
     app.run(host='0.0.0.0', port=80)
 
