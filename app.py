@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from models import db, Usuario
+import random
 
 app = Flask(__name__)
 
@@ -9,12 +10,23 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-# Inicializar la base de datos y añadir un usuario de ejemplo si está vacía
+# Inicializar la base de datos y añadir usuarios de ejemplo si está vacía
 with app.app_context():
     db.create_all()
     if Usuario.query.count() == 0:
-        demo_user = Usuario(nombre="Admin", email="admin@example.com", rol="Administrador")
-        db.session.add(demo_user)
+        nombres = [
+            "Admin", "Juan", "María", "Carlos", "Ana", "Luis", "Sofía", "Miguel",
+            "Lucía", "Pedro", "Carmen", "Jorge", "Elena", "Diego", "Laura", 
+            "Alberto", "Isabel", "Fernando", "Paula", "Ricardo"
+        ]
+        roles = ["Administrador", "Usuario", "Moderador", "Invitado"]
+
+        for i, nombre in enumerate(nombres):
+            email = f"{nombre.lower()}{i}@example.com"
+            rol = random.choice(roles)
+            usuario = Usuario(nombre=nombre, email=email, rol=rol)
+            db.session.add(usuario)
+
         db.session.commit()
 
 # Rutas
@@ -24,7 +36,6 @@ def home():
 
 @app.route('/estadisticas')
 def estadisticas():
-    # Ejemplo: puedes calcular estadísticas reales aquí
     usuarios = Usuario.query.all()
     total_usuarios = len(usuarios)
     return render_template('estadisticas.html', total_usuarios=total_usuarios, usuarios=usuarios)
