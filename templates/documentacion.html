@@ -1,16 +1,17 @@
 {% extends "base.html" %}
-{% block content %}
-<div class="mt-5 text-center">
-    <h1 class="text-warning mb-4">Documentación</h1>
-    <p class="lead">Aquí puedes incluir guías técnicas, instrucciones de instalación o notas del proyecto.</p>
-    <div class="text-start mx-auto" style="max-width: 700px;">
-        <h5>Instalación local:</h5>
-        <pre><code>docker build -t miapp-flask .
-docker run -p 8081:80 miapp-flask</code></pre>
 
-        <h5>Despliegue automático:</h5>
-        <p>El pipeline de Jenkins construye la imagen, la envía al servidor y verifica su estado.</p>
-    </div>
-    <a href="{{ url_for('home') }}" class="btn btn-secondary mt-4">Volver al inicio</a>
+{% block content %}
+<div class="container mt-5 fade-in">
+    <h2 class="text-warning mb-4">Documentación del Proyecto</h2>
+    <p>Esta aplicación Flask sirve como ejemplo completo de un entorno DevOps moderno:</p>
+    <ul>
+        <li>Framework backend: Flask (Python)</li>
+        <li>Frontend: HTML, Bootstrap y CSS personalizado</li>
+        <li>Base de datos: SQLite con SQLAlchemy</li>
+        <li>Integración continua: Jenkins</li>
+        <li>Despliegue automatizado: Docker</li>
+        <li>Control de calidad: SonarQube</li>
+    </ul>
 </div>
 {% endblock %}
+
