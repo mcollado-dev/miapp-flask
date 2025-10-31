@@ -63,24 +63,25 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                echo 'Ejecutando SonarQube...'
-                withSonarQubeEnv('SonarQube-Local') {
-                    sh '''
-                        sonar-scanner \
-                            -Dsonar.projectKey=miapp-flask \
-                            -Dsonar.sources=app.py,templates,static \
-                            -Dsonar.host.url=$SONAR_HOST_URL \
-                            -Dsonar.login=$SONAR_AUTH_TOKEN
-                    '''
+                timeout(time: 5, unit: 'MINUTES') {
+                    echo 'Ejecutando SonarQube...'
+                    withSonarQubeEnv('SonarQube-Local') {
+                        sh '''
+                            sonar-scanner \
+                                -Dsonar.projectKey=miapp-flask \
+                                -Dsonar.sources=app.py,templates,static \
+                                -Dsonar.host.url=$SONAR_HOST_URL \
+                                -Dsonar.login=$SONAR_AUTH_TOKEN
+                        '''
+                    }
                 }
             }
-            timeout(time: 5, unit: 'MINUTES')  // aborta si tarda más de 5 min
         }
 
         stage('Quality Gate') {
             steps {
-                echo 'Esperando resultado del Quality Gate...'
                 timeout(time: 5, unit: 'MINUTES') {
+                    echo 'Esperando resultado del Quality Gate...'
                     waitForQualityGate abortPipeline: true
                 }
             }
@@ -96,3 +97,4 @@ pipeline {
         }
     }
 }
+
