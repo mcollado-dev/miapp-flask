@@ -19,12 +19,12 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                echo 'Ejecutando análisis SonarQube...'
+                echo 'Ejecutando análisis SonarQube (modo verbose)...'
                 withSonarQubeEnv('SonarQube-Local') { // Ajusta el nombre según tu configuración de Jenkins
                     script {
                         def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                         sh """
-                            ${scannerHome}/bin/sonar-scanner \
+                            ${scannerHome}/bin/sonar-scanner -X \
                                 -Dsonar.projectKey=miapp-flask \
                                 -Dsonar.sources=. \
                                 -Dsonar.host.url=${SONAR_HOST_URL} \
