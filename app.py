@@ -20,7 +20,10 @@ with app.app_context():
             "Lucía", "Pedro", "Carmen", "Jorge", "Elena", "Diego", "Laura", 
             "Alberto", "Isabel", "Fernando", "Paula", "Ricardo"
         ]
-        roles = ["Administrador", "Usuario", "Moderador", "Invitado"]
+        roles = [
+            "Administrador", "Usuario", "Moderador", "Invitado",
+            "SuperUsuario", "Editor", "Colaborador", "Visitante"
+        ]
 
         for i, nombre in enumerate(nombres):
             email = f"{nombre.lower()}{i}@example.com"
