@@ -7,8 +7,7 @@ pipeline {
         DEPLOY_HOST    = '192.168.56.106'
         APP_PORT       = '8081'
         CONTAINER_PORT = '80'
-        SONAR_HOST_URL = 'http://192.168.56.106:9000'
-        SONAR_AUTH_TOKEN = credentials('sonar-token')
+        SONAR_AUTH_TOKEN = credentials('sonar-token')  // Token guardado en Jenkins
     }
 
     stages {
@@ -56,15 +55,9 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                echo 'Ejecutando SonarQube...'
+                echo 'Ejecutando SonarQube con plugin de Jenkins...'
                 withSonarQubeEnv('SonarQube-Local') {
-                    sh """
-                        sonar-scanner \
-                          -Dsonar.projectKey=${APP_NAME} \
-                          -Dsonar.sources=. \
-                          -Dsonar.host.url=${SONAR_HOST_URL} \
-                          -Dsonar.login=${SONAR_AUTH_TOKEN}
-                    """
+                    sh "sonar-scanner -Dsonar.projectKey=${APP_NAME} -Dsonar.sources=. -Dsonar.login=${SONAR_AUTH_TOKEN}"
                 }
             }
         }
@@ -72,7 +65,7 @@ pipeline {
         stage('Quality Gate') {
             steps {
                 echo 'Esperando resultado del Quality Gate...'
-                timeout(time: 15, unit: 'MINUTES') {
+                timeout(time: 10, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
             }
