@@ -1,9 +1,27 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="mt-5 text-center">
-    <h1 class="text-primary mb-4">Estadísticas</h1>
-    <p class="lead">Aquí podrías mostrar gráficos, métricas o reportes sobre la aplicación.</p>
-    <p>Por ejemplo: número de usuarios, visitas, o logs de actividad.</p>
-    <a href="{{ url_for('home') }}" class="btn btn-secondary mt-4">Volver al inicio</a>
+<div class="container mt-5 fade-in">
+    <h2 class="text-primary mb-4">Usuarios Registrados</h2>
+
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in usuarios %}
+            <tr>
+                <td>{{ u.id }}</td>
+                <td>{{ u.nombre }}</td>
+                <td>{{ u.email }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}
+
