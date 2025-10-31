@@ -17,6 +17,33 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                echo 'Ejecutando análisis SonarQube...'
+                withSonarQubeEnv('SonarQube-Local') { // Ajusta el nombre según tu configuración de Jenkins
+                    script {
+                        def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                                -Dsonar.projectKey=miapp-flask \
+                                -Dsonar.sources=. \
+                                -Dsonar.host.url=${SONAR_HOST_URL} \
+                                -Dsonar.login=${SONAR_AUTH_TOKEN}
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                echo 'Esperando resultado del Quality Gate de SonarQube...'
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 echo 'Construyendo imagen Docker de Flask...'
@@ -65,7 +92,7 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline completado correctamente: app desplegada.'
+            echo 'Pipeline completado correctamente: análisis SonarQube y app desplegada.'
         }
         failure {
             echo 'Falló el pipeline. Revisa los logs.'
