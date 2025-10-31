@@ -15,9 +15,9 @@ def crear_tablas():
     db.create_all()
     if Usuario.query.count() == 0:
         ejemplo = [
-            Usuario(nombre='Manuel Collado', email='manuel@example.com'),
-            Usuario(nombre='Laura Pérez', email='laura@example.com'),
-            Usuario(nombre='Carlos Gómez', email='carlos@example.com')
+            Usuario(nombre='Manuel Collado', email='manuel@example.com', rol='Administrador'),
+            Usuario(nombre='Laura Pérez', email='laura@example.com', rol='Editor'),
+            Usuario(nombre='Carlos Gómez', email='carlos@example.com', rol='Lector')
         ]
         db.session.add_all(ejemplo)
         db.session.commit()
@@ -30,15 +30,15 @@ def home():
 def estadisticas():
     usuarios = Usuario.query.all()
 
-    # Datos simulados para gráfico de barras
+    # Datos para gráfico de barras (simulado)
     meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"]
     registros = [3, 5, 2, 8, 4, 6]
 
-    # Datos simulados para gráfico circular
-    roles = {
-        "Administradores": 2,
-        "Editores": 5,
-        "Lectores": 3
+    # Datos para gráfico circular (roles)
+    roles_count = {
+        "Administradores": Usuario.query.filter_by(rol='Administrador').count(),
+        "Editores": Usuario.query.filter_by(rol='Editor').count(),
+        "Lectores": Usuario.query.filter_by(rol='Lector').count()
     }
 
     return render_template(
@@ -46,7 +46,7 @@ def estadisticas():
         usuarios=usuarios,
         labels=meses,
         data=registros,
-        roles=roles
+        roles=roles_count
     )
 
 @app.route('/funciones')
