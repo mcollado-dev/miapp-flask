@@ -1,14 +1,14 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="mt-5 text-center">
-    <h1 class="text-success mb-4">Funciones</h1>
-    <p class="lead">Lista de las principales funcionalidades de la aplicación:</p>
-    <ul class="list-group mx-auto" style="max-width: 600px;">
-        <li class="list-group-item">-Despliegue automático con Jenkins</li>
-        <li class="list-group-item">-Contenerización con Docker</li>
-        <li class="list-group-item">-Estructura modular con Flask</li>
-        <li class="list-group-item">-Estilo con Bootstrap y CSS personalizado</li>
+<div class="container mt-5 fade-in">
+    <h2 class="text-success mb-4">Funciones Disponibles</h2>
+    <ul class="list-group shadow-sm">
+        <li class="list-group-item">Gestión de usuarios con base de datos SQLAlchemy</li>
+        <li class="list-group-item">Visualización de datos con Chart.js</li>
+        <li class="list-group-item">Despliegue automatizado con Jenkins y Docker</li>
+        <li class="list-group-item">Interfaz limpia con Bootstrap 5</li>
     </ul>
-    <a href="{{ url_for('home') }}" class="btn btn-secondary mt-4">Volver al inicio</a>
 </div>
 {% endblock %}
+
