@@ -47,7 +47,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Gráfico lineal de registros mensuales
     const lineCtx = document.getElementById('lineChart').getContext('2d');
     const lineChart = new Chart(lineCtx, {
         type: 'line',
@@ -63,21 +62,9 @@
                 tension: 0.3
             }]
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'top' },
-                title: {
-                    display: true,
-                    text: 'Registros Mensuales',
-                    color: '#0d6efd',
-                    font: { size: 16 }
-                }
-            }
-        }
+        options: { responsive: true }
     });
 
-    // Gráfico circular de roles
     const pieCtx = document.getElementById('pieChart').getContext('2d');
     const pieChart = new Chart(pieCtx, {
         type: 'pie',
@@ -85,25 +72,10 @@
             labels: Object.keys({{ roles | safe }}),
             datasets: [{
                 data: Object.values({{ roles | safe }}),
-                backgroundColor: [
-                    '#0d6efd',
-                    '#198754',
-                    '#ffc107'
-                ]
+                backgroundColor: ['#0d6efd','#198754','#ffc107']
             }]
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'bottom' },
-                title: {
-                    display: true,
-                    text: 'Distribución de Roles de Usuario',
-                    color: '#0d6efd',
-                    font: { size: 16 }
-                }
-            }
-        }
+        options: { responsive: true }
     });
 </script>
 {% endblock %}
