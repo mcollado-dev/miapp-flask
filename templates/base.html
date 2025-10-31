@@ -8,23 +8,29 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="bg-light">
-    <nav class="navbar navbar-dark bg-dark mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('home') }}">Flask + Jenkins + Docker</a>
-            <div>
-                <a class="nav-link d-inline text-white" href="{{ url_for('estadisticas') }}">Estadísticas</a>
-                <a class="nav-link d-inline text-white" href="{{ url_for('funciones') }}">Funciones</a>
-                <a class="nav-link d-inline text-white" href="{{ url_for('documentacion') }}">Documentación</a>
-            </div>
-        </div>
-    </nav>
 
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
     <div class="container">
-        {% block content %}{% endblock %}
+        <a class="navbar-brand" href="/">Flask App Real</a>
+        <div>
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" href="/estadisticas">Estadísticas</a></li>
+                <li class="nav-item"><a class="nav-link" href="/funciones">Funciones</a></li>
+                <li class="nav-item"><a class="nav-link" href="/documentacion">Documentación</a></li>
+            </ul>
+        </div>
     </div>
+</nav>
 
-    <footer class="text-center text-muted mt-5 mb-3">
-        <small>Desplegado automáticamente con Jenkins y Docker</small>
-    </footer>
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+
+<footer class="text-center text-muted mt-5 mb-3">
+    <small>Desplegado automáticamente con Jenkins</small>
+</footer>
+
 </body>
 </html>
+
