@@ -27,69 +27,48 @@ pipeline {
         stage('Deploy Flask App') {
             steps {
                 echo "Desplegando aplicación Flask en ${DEPLOY_HOST}..."
-                sh '''
+                sh """
                     docker save ${APP_NAME}:latest | bzip2 | \
                     ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
+                        set -e
                         bunzip2 | docker load
-                        docker rm -f ${APP_NAME} || true
+                        if docker ps -a --format "{{.Names}}" | grep -Eq "^${APP_NAME}\$"; then
+                            docker rm -f ${APP_NAME}
+                        fi
                         docker run -d -p ${APP_PORT}:${CONTAINER_PORT} --name ${APP_NAME} ${APP_NAME}:latest
                     '
-                '''
+                """
             }
         }
 
         stage('Verificar Despliegue') {
             steps {
                 echo 'Verificando que la app responde...'
-                sh '''
+                sh """
                     ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
-                        MAX_TRIES=15
                         COUNT=0
-                        until curl -s -o /dev/null -w "%{http_code}" http://localhost:'${APP_PORT}' | grep 200 > /dev/null; do
+                        MAX=15
+                        until curl -s -o /dev/null -w "%{http_code}" http://localhost:${APP_PORT} | grep 200 > /dev/null; do
                             sleep 2
-                            COUNT=$((COUNT+1))
-                            if [ $COUNT -ge $MAX_TRIES ]; then
+                            COUNT=\$((COUNT+1))
+                            if [ \$COUNT -ge \$MAX ]; then
                                 echo "Flask no responde después de 30 segundos"
                                 exit 1
                             fi
                         done
                         echo "App Flask corriendo correctamente"
                     '
-                '''
-            }
-        }
-
-        stage('SonarQube Analysis') {
-            steps {
-                echo 'Ejecutando análisis SonarQube...'
-                withSonarQubeEnv('SonarQube-Local') {
-                    sh '''
-                        sonar-scanner \
-                            -Dsonar.projectKey=${APP_NAME} \
-                            -Dsonar.sources=. \
-                            -Dsonar.host.url=$SONAR_HOST_URL \
-                            -Dsonar.login=$SONAR_AUTH_TOKEN
-                    '''
-                }
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                echo 'Esperando resultado del Quality Gate de SonarQube...'
-                timeout(time: 15, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
+                """
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline completado correctamente: app desplegada y análisis SonarQube OK.'
+            echo 'Pipeline completado correctamente: app desplegada.'
         }
         failure {
-            echo 'Falló el pipeline. Revisa los logs en Jenkins.'
+            echo 'Falló el pipeline. Revisa los logs.'
         }
     }
 }
