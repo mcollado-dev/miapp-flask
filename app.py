@@ -13,7 +13,6 @@ db.init_app(app)
 @app.before_first_request
 def crear_tablas():
     db.create_all()
-    # Datos de ejemplo solo si la tabla está vacía
     if Usuario.query.count() == 0:
         ejemplo = [
             Usuario(nombre='Manuel Collado', email='manuel@example.com'),
@@ -30,7 +29,9 @@ def home():
 @app.route('/estadisticas')
 def estadisticas():
     usuarios = Usuario.query.all()
-    return render_template('estadisticas.html', usuarios=usuarios)
+    meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"]
+    registros = [3, 5, 2, 8, 4, 6]
+    return render_template('estadisticas.html', usuarios=usuarios, labels=meses, data=registros)
 
 @app.route('/funciones')
 def funciones():
@@ -42,6 +43,7 @@ def documentacion():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
+
 
 
 
