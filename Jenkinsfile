@@ -19,25 +19,21 @@ pipeline {
             }
         }
 
-        stage('Build & Deploy Docker') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Construyendo y desplegando Docker en host remoto...'
-                sh """
-                    ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} \\
-                    "docker pull python:3.10-slim && \
-                     mkdir -p ~/miapp-flask && cd ~/miapp-flask && \
-                     rm -rf * && exit"
-                """
+                echo 'Construyendo imagen Docker en Jenkins...'
+                sh "docker build -t ${APP_NAME}:latest ."
+            }
+        }
 
+        stage('Deploy Flask App') {
+            steps {
+                echo "Desplegando app en ${DEPLOY_HOST}..."
                 sh """
-                    scp -r * ${DEPLOY_USER}@${DEPLOY_HOST}:~/miapp-flask/
-                """
-
-                sh """
+                    docker save ${APP_NAME}:latest | bzip2 | \\
                     ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} \\
-                    "cd ~/miapp-flask && \
-                     docker build -t ${APP_NAME}:latest . && \
-                     docker rm -f ${APP_NAME} || true && \
+                    "bunzip2 | docker load; \
+                     docker rm -f ${APP_NAME} || true; \
                      docker run -d -p ${APP_PORT}:${CONTAINER_PORT} --name ${APP_NAME} ${APP_NAME}:latest"
                 """
             }
@@ -50,8 +46,8 @@ pipeline {
                     ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} \\
                     "MAX_TRIES=15; COUNT=0; \
                      until curl -s -o /dev/null -w '%{http_code}' http://localhost:${APP_PORT} | grep 200 > /dev/null; do \
-                        sleep 2; COUNT=\$((COUNT+1)); \
-                        if [ \$COUNT -ge \$MAX_TRIES ]; then echo 'Flask no responde'; exit 1; fi; \
+                        sleep 2; COUNT=\\\$((COUNT+1)); \
+                        if [ \\\$COUNT -ge \\\$MAX_TRIES ]; then echo 'Flask no responde'; exit 1; fi; \
                      done; \
                      echo 'App Flask corriendo correctamente'"
                 """
@@ -60,7 +56,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                echo 'Ejecutando análisis SonarQube...'
+                echo 'Ejecutando SonarQube...'
                 withSonarQubeEnv('SonarQube-Local') {
                     sh """
                         sonar-scanner \
@@ -85,7 +81,7 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline completado correctamente: app desplegada y análisis SonarQube OK.'
+            echo 'Pipeline completado: app desplegada y SonarQube OK.'
         }
         failure {
             echo 'Pipeline falló, revisa los logs.'
