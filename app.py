@@ -1,17 +1,15 @@
 from flask import Flask, render_template
 from models import db, Usuario
-import os
 
 app = Flask(__name__)
 
-# Configuración base de datos SQLite
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///miapp.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-@app.before_first_request
-def init_db():
+# Inicializar la base de datos al arrancar la app
+with app.app_context():
     db.create_all()
     if Usuario.query.count() == 0:
         usuarios = [
@@ -36,13 +34,11 @@ def estadisticas():
         "Editores": Usuario.query.filter_by(rol='Editor').count(),
         "Lectores": Usuario.query.filter_by(rol='Lector').count()
     }
-    return render_template(
-        'estadisticas.html',
-        usuarios=usuarios,
-        labels=meses,
-        data=registros,
-        roles=roles_count
-    )
+    return render_template('estadisticas.html',
+                           usuarios=usuarios,
+                           labels=meses,
+                           data=registros,
+                           roles=roles_count)
 
 @app.route('/funciones')
 def funciones():
@@ -53,7 +49,6 @@ def documentacion():
     return render_template('documentacion.html')
 
 if __name__ == '__main__':
-    # Asegurarse de que escucha en 0.0.0.0 para Docker
     app.run(host='0.0.0.0', port=80)
 
 
