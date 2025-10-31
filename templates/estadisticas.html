@@ -4,6 +4,13 @@
 <div class="container mt-5 fade-in">
     <h2 class="text-primary mb-4">Usuarios Registrados</h2>
 
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+            <canvas id="graficoUsuarios" height="100"></canvas>
+        </div>
+    </div>
+
+    <h4 class="text-secondary mb-3">Listado de usuarios</h4>
     <table class="table table-striped table-hover">
         <thead class="table-dark">
             <tr>
@@ -23,5 +30,35 @@
         </tbody>
     </table>
 </div>
+
+<script>
+    const ctx = document.getElementById('graficoUsuarios');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ labels | tojson }},
+            datasets: [{
+                label: 'Usuarios registrados por mes',
+                data: {{ data | tojson }},
+                borderWidth: 1,
+                backgroundColor: 'rgba(13, 110, 253, 0.6)',
+                borderColor: 'rgba(13, 110, 253, 1)',
+            }]
+        },
+        options: {
+            scales: { y: { beginAtZero: true } },
+            plugins: {
+                legend: { display: true },
+                title: {
+                    display: true,
+                    text: 'Estadísticas de registro de usuarios',
+                    color: '#0d6efd',
+                    font: { size: 16 }
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}
+
 
