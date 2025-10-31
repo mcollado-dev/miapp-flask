@@ -1,25 +1,25 @@
 from flask import Flask, render_template
 from models import db, Usuario
+import os
 
 app = Flask(__name__)
 
-# Configuración de la base de datos SQLite
+# Configuración base de datos SQLite
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///miapp.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Inicializar SQLAlchemy
 db.init_app(app)
 
 @app.before_first_request
-def crear_tablas():
+def init_db():
     db.create_all()
     if Usuario.query.count() == 0:
-        ejemplo = [
+        usuarios = [
             Usuario(nombre='Manuel Collado', email='manuel@example.com', rol='Administrador'),
             Usuario(nombre='Laura Pérez', email='laura@example.com', rol='Editor'),
             Usuario(nombre='Carlos Gómez', email='carlos@example.com', rol='Lector')
         ]
-        db.session.add_all(ejemplo)
+        db.session.add_all(usuarios)
         db.session.commit()
 
 @app.route('/')
@@ -29,18 +29,13 @@ def home():
 @app.route('/estadisticas')
 def estadisticas():
     usuarios = Usuario.query.all()
-
-    # Datos para gráfico de barras (simulado)
     meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"]
     registros = [3, 5, 2, 8, 4, 6]
-
-    # Datos para gráfico circular (roles)
     roles_count = {
         "Administradores": Usuario.query.filter_by(rol='Administrador').count(),
         "Editores": Usuario.query.filter_by(rol='Editor').count(),
         "Lectores": Usuario.query.filter_by(rol='Lector').count()
     }
-
     return render_template(
         'estadisticas.html',
         usuarios=usuarios,
@@ -58,9 +53,7 @@ def documentacion():
     return render_template('documentacion.html')
 
 if __name__ == '__main__':
+    # Asegurarse de que escucha en 0.0.0.0 para Docker
     app.run(host='0.0.0.0', port=80)
-
-
-
 
 
