@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from models import db, Usuario
 import random
+from collections import Counter
 
 app = Flask(__name__)
 
@@ -38,7 +39,19 @@ def home():
 def estadisticas():
     usuarios = Usuario.query.all()
     total_usuarios = len(usuarios)
-    return render_template('estadisticas.html', total_usuarios=total_usuarios, usuarios=usuarios)
+
+    # Contar usuarios por rol
+    roles_count = Counter([u.rol for u in usuarios])
+    roles_labels = list(roles_count.keys())
+    roles_data = list(roles_count.values())
+
+    return render_template(
+        'estadisticas.html',
+        total_usuarios=total_usuarios,
+        usuarios=usuarios,
+        roles_labels=roles_labels,
+        roles_data=roles_data
+    )
 
 @app.route('/funciones')
 def funciones():
