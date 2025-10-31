@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from models import db, Usuario
-import random
+import secrets  # <-- reemplaza random por secrets
 from collections import Counter
 
 app = Flask(__name__)
@@ -27,7 +27,7 @@ with app.app_context():
 
         for i, nombre in enumerate(nombres):
             email = f"{nombre.lower()}{i}@example.com"
-            rol = random.choice(roles)
+            rol = secrets.choice(roles)  # <-- ahora es criptográficamente seguro
             usuario = Usuario(nombre=nombre, email=email, rol=rol)
             db.session.add(usuario)
 
