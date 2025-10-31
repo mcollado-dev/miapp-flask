@@ -29,25 +29,25 @@ pipeline {
         stage('Deploy Flask App') {
             steps {
                 echo "Desplegando aplicación Flask en ${DEPLOY_HOST}..."
-                sh """
+                sh '''
                     docker save ${APP_NAME}:latest | bzip2 | \
                     ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
                         bunzip2 | docker load
                         docker rm -f ${APP_NAME} || true
                         docker run -d -p ${APP_PORT}:${CONTAINER_PORT} --name ${APP_NAME} ${APP_NAME}:latest
                     '
-                """
+                '''
             }
         }
 
         stage('Verificar Despliegue') {
             steps {
                 echo 'Verificando que la app responde...'
-                sh """
+                sh '''
                     ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
                         MAX_TRIES=15
                         COUNT=0
-                        until curl -s -o /dev/null -w "%{http_code}" http://localhost:${APP_PORT} | grep 200 > /dev/null; do
+                        until curl -s -o /dev/null -w "%{http_code}" http://localhost:'${APP_PORT}' | grep 200 > /dev/null; do
                             sleep 2
                             COUNT=$((COUNT+1))
                             if [ $COUNT -ge $MAX_TRIES ]; then
@@ -57,7 +57,7 @@ pipeline {
                         done
                         echo "App Flask corriendo correctamente"
                     '
-                """
+                '''
             }
         }
 
