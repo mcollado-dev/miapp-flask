@@ -5,10 +5,12 @@ pipeline {
         APP_NAME        = 'miapp-flask'
         DEPLOY_USER     = 'manuelcollado'
         DEPLOY_HOST     = '192.168.56.106'
-        APP_PORT        = '8081'      // Puerto del host
-        CONTAINER_PORT  = '80'        // Puerto interno del contenedor
-        SONAR_HOST_URL  = 'http://192.168.56.100:9000'  // Cambia según tu SonarQube
-        SONAR_AUTH_TOKEN= credentials('sonar-token')     // Token guardado en Jenkins
+        APP_PORT        = '8081'    // Puerto del host donde se expondrá Flask
+        CONTAINER_PORT  = '80'      // Puerto interno del contenedor Flask
+
+        // SonarQube
+        SONAR_HOST_URL  = 'http://localhost:9000'
+        SONAR_AUTH_TOKEN = credentials('sonar-token') // Añade tu token en Jenkins Credentials
     }
 
     stages {
@@ -16,24 +18,6 @@ pipeline {
             steps {
                 echo 'Clonando repositorio...'
                 checkout scm
-            }
-        }
-
-        stage('SonarQube Analysis') {
-            steps {
-                echo 'Ejecutando análisis SonarQube...'
-                withSonarQubeEnv('SonarQube-Local') {
-                    script {
-                        def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                        sh """
-                            ${scannerHome}/bin/sonar-scanner \
-                                -Dsonar.projectKey=${APP_NAME} \
-                                -Dsonar.sources=. \
-                                -Dsonar.host.url=${SONAR_HOST_URL} \
-                                -Dsonar.login=${SONAR_AUTH_TOKEN}
-                        """
-                    }
-                }
             }
         }
 
@@ -48,31 +32,52 @@ pipeline {
             steps {
                 echo "Desplegando aplicación Flask en ${DEPLOY_HOST}..."
                 sh """
-                docker save ${APP_NAME}:latest | bzip2 | \
-                ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
-                    bunzip2 | docker load
-                    docker rm -f ${APP_NAME} || true
-                    docker run -d -p ${APP_PORT}:${CONTAINER_PORT} --name ${APP_NAME} ${APP_NAME}:latest
-                '
+                    docker save ${APP_NAME}:latest | bzip2 | \
+                    ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
+                        bunzip2 | docker load
+                        docker rm -f ${APP_NAME} || true
+                        docker run -d -p ${APP_PORT}:${CONTAINER_PORT} --name ${APP_NAME} ${APP_NAME}:latest
+                    '
                 """
             }
         }
 
         stage('Verificar Despliegue') {
             steps {
-                echo 'Verificando que la app responde...'
+                echo "Verificando que la app responde..."
                 sh """
-                ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
-                    sleep 5
-                    STATUS=\$(curl -s -o /dev/null -w "%{http_code}" http://localhost:${APP_PORT})
-                    if [ "\$STATUS" -eq 200 ]; then
+                    ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
+                        MAX_TRIES=10
+                        COUNT=0
+                        until curl -s -o /dev/null -w "%{http_code}" http://localhost:${APP_PORT} | grep 200 > /dev/null; do
+                            sleep 2
+                            COUNT=\$((COUNT+1))
+                            if [ \$COUNT -ge \$MAX_TRIES ]; then
+                                echo "Flask no responde después de 20 segundos"
+                                exit 1
+                            fi
+                        done
                         echo "App Flask corriendo correctamente"
-                    else
-                        echo "Error: App Flask no responde (HTTP \$STATUS)"
-                        exit 1
-                    fi
-                '
+                    '
                 """
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                echo 'Ejecutando análisis SonarQube...'
+                withSonarQubeEnv('SonarQube-Local') {
+                    script {
+                        def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                                -Dsonar.projectKey=miapp-flask \
+                                -Dsonar.sources=. \
+                                -Dsonar.host.url=${SONAR_HOST_URL} \
+                                -Dsonar.login=${SONAR_AUTH_TOKEN}
+                        """
+                    }
+                }
             }
         }
 
@@ -88,7 +93,7 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline completado correctamente: SonarQube y despliegue OK.'
+            echo 'Pipeline completado correctamente: Flask desplegado y SonarQube OK.'
         }
         failure {
             echo 'Falló el pipeline. Revisa los logs.'
