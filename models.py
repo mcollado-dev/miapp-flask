@@ -12,3 +12,4 @@ class Usuario(db.Model):
         return f'<Usuario {self.nombre}>'
 
 
+
