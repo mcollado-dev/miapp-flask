@@ -5,6 +5,7 @@
 
 <p>Total de usuarios: <strong>{{ total_usuarios }}</strong></p>
 
+<!-- Tabla de usuarios -->
 <table class="table table-striped table-hover">
     <thead class="table-dark">
         <tr>
@@ -25,7 +26,39 @@
         {% endfor %}
     </tbody>
 </table>
+
+<!-- Gráfico circular -->
+<h3 class="mt-4">Distribución de roles</h3>
+<canvas id="rolesChart" width="400" height="400"></canvas>
+
+<!-- Incluir Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('rolesChart').getContext('2d');
+const rolesChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: {{ roles_labels|safe }},
+        datasets: [{
+            label: 'Usuarios por rol',
+            data: {{ roles_data|safe }},
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)',
+                'rgba(75, 192, 192, 0.6)',
+                'rgba(153, 102, 255, 0.6)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true
+    }
+});
+</script>
 {% endblock %}
+
 
 
 
