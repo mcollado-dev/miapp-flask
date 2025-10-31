@@ -1,9 +1,14 @@
 pipeline {
-    agent any
+    agent { label 'debian-agent' }
 
     environment {
+        APP_NAME       = 'miapp-flask'
+        DEPLOY_USER    = 'manuelcollado'
+        DEPLOY_HOST    = '192.168.56.106'
+        APP_PORT       = '8081'
+        CONTAINER_PORT = '80'
         SONAR_HOST_URL = 'http://192.168.56.106:9000'
-        SONAR_AUTH_TOKEN = credentials('sonar-token')  // Token guardado en Jenkins
+        SONAR_AUTH_TOKEN = credentials('sonar-token')
     }
 
     stages {
@@ -14,22 +19,26 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build & Deploy Docker') {
             steps {
-                echo 'Construyendo imagen Docker...'
-                sh "docker build -t miapp-flask:latest ."
-            }
-        }
-
-        stage('Deploy Flask App') {
-            steps {
-                echo 'Desplegando app en host remoto...'
+                echo 'Construyendo y desplegando Docker en host remoto...'
                 sh """
-                    docker save miapp-flask:latest | bzip2 | \\
-                    ssh manuelcollado@192.168.56.106 \\
-                    "bunzip2 | docker load; \
-                     docker rm -f miapp-flask || true; \
-                     docker run -d -p 8081:80 --name miapp-flask miapp-flask:latest"
+                    ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} \\
+                    "docker pull python:3.10-slim && \
+                     mkdir -p ~/miapp-flask && cd ~/miapp-flask && \
+                     rm -rf * && exit"
+                """
+
+                sh """
+                    scp -r * ${DEPLOY_USER}@${DEPLOY_HOST}:~/miapp-flask/
+                """
+
+                sh """
+                    ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} \\
+                    "cd ~/miapp-flask && \
+                     docker build -t ${APP_NAME}:latest . && \
+                     docker rm -f ${APP_NAME} || true && \
+                     docker run -d -p ${APP_PORT}:${CONTAINER_PORT} --name ${APP_NAME} ${APP_NAME}:latest"
                 """
             }
         }
@@ -38,9 +47,9 @@ pipeline {
             steps {
                 echo 'Comprobando que Flask responde...'
                 sh """
-                    ssh manuelcollado@192.168.56.106 \\
+                    ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} \\
                     "MAX_TRIES=15; COUNT=0; \
-                     until curl -s -o /dev/null -w '%{http_code}' http://localhost:8081 | grep 200 > /dev/null; do \
+                     until curl -s -o /dev/null -w '%{http_code}' http://localhost:${APP_PORT} | grep 200 > /dev/null; do \
                         sleep 2; COUNT=\$((COUNT+1)); \
                         if [ \$COUNT -ge \$MAX_TRIES ]; then echo 'Flask no responde'; exit 1; fi; \
                      done; \
@@ -55,7 +64,7 @@ pipeline {
                 withSonarQubeEnv('SonarQube-Local') {
                     sh """
                         sonar-scanner \
-                          -Dsonar.projectKey=miapp-flask \
+                          -Dsonar.projectKey=${APP_NAME} \
                           -Dsonar.sources=. \
                           -Dsonar.host.url=${SONAR_HOST_URL} \
                           -Dsonar.login=${SONAR_AUTH_TOKEN}
@@ -66,7 +75,7 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                echo 'Esperando resultado del Quality Gate de SonarQube...'
+                echo 'Esperando resultado del Quality Gate...'
                 timeout(time: 15, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
@@ -83,3 +92,4 @@ pipeline {
         }
     }
 }
+
