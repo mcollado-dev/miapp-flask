@@ -3,6 +3,7 @@ from models import db, Usuario
 
 app = Flask(__name__)
 
+# Configuración de la base de datos
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///miapp.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -12,6 +13,7 @@ db.init_app(app)
 with app.app_context():
     db.create_all()
     if Usuario.query.count() == 0:
+        # Añadir usuarios de ejemplo
         usuarios = [
             Usuario(nombre='Manuel Collado', email='manuel@example.com', rol='Administrador'),
             Usuario(nombre='Laura Pérez', email='laura@example.com', rol='Editor'),
@@ -20,6 +22,7 @@ with app.app_context():
         db.session.add_all(usuarios)
         db.session.commit()
 
+# Rutas de la aplicación
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -49,6 +52,6 @@ def documentacion():
     return render_template('documentacion.html')
 
 if __name__ == '__main__':
+    # Escuchar en todas las interfaces para Docker
     app.run(host='0.0.0.0', port=80)
-
 
