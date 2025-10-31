@@ -29,9 +29,25 @@ def home():
 @app.route('/estadisticas')
 def estadisticas():
     usuarios = Usuario.query.all()
+
+    # Datos simulados para gráfico de barras
     meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio"]
     registros = [3, 5, 2, 8, 4, 6]
-    return render_template('estadisticas.html', usuarios=usuarios, labels=meses, data=registros)
+
+    # Datos simulados para gráfico circular
+    roles = {
+        "Administradores": 2,
+        "Editores": 5,
+        "Lectores": 3
+    }
+
+    return render_template(
+        'estadisticas.html',
+        usuarios=usuarios,
+        labels=meses,
+        data=registros,
+        roles=roles
+    )
 
 @app.route('/funciones')
 def funciones():
