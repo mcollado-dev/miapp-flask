@@ -7,10 +7,10 @@ pipeline {
         DEPLOY_HOST    = '192.168.56.106'
         APP_PORT       = '8081'
         CONTAINER_PORT = '80'
-        COVERAGE_FILE  = 'coverage.xml'
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 echo 'Clonando repositorio...'
@@ -20,17 +20,19 @@ pipeline {
 
         stage('Run Unit Tests') {
             steps {
-                echo 'Ejecutando tests con cobertura...'
+                echo 'Ejecutando tests con cobertura (entorno virtual)...'
                 sh '''
+                    python3 -m venv venv
+                    . venv/bin/activate
                     pip install --no-cache-dir -r requirements.txt
-                    pytest --cov=. --cov-report=xml:${COVERAGE_FILE} || true
+                    pytest --maxfail=1 --disable-warnings --cov=.
                 '''
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
-                echo 'Ejecutando análisis SonarQube (modo verbose)...'
+                echo 'Ejecutando análisis SonarQube (modo verbose con Python 3)...'
                 withSonarQubeEnv('SonarQube-Local') {
                     script {
                         def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
@@ -38,8 +40,8 @@ pipeline {
                             ${scannerHome}/bin/sonar-scanner -X \
                                 -Dsonar.projectKey=miapp-flask \
                                 -Dsonar.sources=. \
+                                -Dsonar.language=py \
                                 -Dsonar.python.version=3 \
-                                -Dsonar.python.coverage.reportPaths=${COVERAGE_FILE} \
                                 -Dsonar.host.url=${SONAR_HOST_URL} \
                                 -Dsonar.login=${SONAR_AUTH_TOKEN} \
                                 -Dsonar.exclusions=**/*.js,**/*.css,**/static/** \
@@ -52,11 +54,8 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                echo 'Esperando resultado del Quality Gate de SonarQube (sin abortar)...'
-                script {
-                    def qg = waitForQualityGate()
-                    echo "Resultado del Quality Gate: ${qg.status}"
-                }
+                echo 'Esperando resultado del Quality Gate de SonarQube...'
+                waitForQualityGate abortPipeline: true
             }
         }
 
@@ -115,4 +114,3 @@ pipeline {
         }
     }
 }
-
