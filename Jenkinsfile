@@ -1,6 +1,10 @@
 pipeline {
     agent { label 'debian-agent' }
 
+    tools {
+        sonarQubeScanner 'SonarScanner' // el nombre que pusiste en Jenkins Global Tool Configuration
+    }
+
     environment {
         APP_PORT = "5000"
         SONAR_HOST_URL = "http://192.168.56.104:9000"
@@ -20,9 +24,7 @@ pipeline {
                     . venv/bin/activate
                     pip install --no-cache-dir -r requirements.txt
                     pip install pytest pytest-cov coverage
-
                     pytest --maxfail=1 --disable-warnings --cov=. --cov-report=xml:coverage.xml --cov-report=term
-                    ls -l coverage.xml
                 '''
             }
         }
@@ -82,4 +84,3 @@ pipeline {
         failure { echo 'Falló el pipeline. Revisa los logs.' }
     }
 }
-
