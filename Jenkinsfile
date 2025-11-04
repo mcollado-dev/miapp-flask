@@ -6,7 +6,6 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout SCM') {
             steps {
                 checkout scm
@@ -16,16 +15,11 @@ pipeline {
         stage('Run Unit Tests') {
             steps {
                 sh """
-                    # Crear y activar entorno virtual
                     python3 -m venv ${VENV_DIR}
                     . ${VENV_DIR}/bin/activate
-
-                    # Instalar dependencias
                     pip install --upgrade pip
                     pip install -r requirements.txt
                     pip install pytest pytest-cov coverage
-
-                    # Ejecutar tests con cobertura
                     pytest --maxfail=1 --disable-warnings --cov=. --cov-report=xml:coverage.xml --cov-report=term
                 """
             }
@@ -35,12 +29,10 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube-Local') {
                     script {
-                        // Ajusta el nombre exacto de tu SonarScanner en Jenkins Global Tool Config
                         def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                         sh """
                             export PATH=${scannerHome}/bin:\$PATH
                             . ${VENV_DIR}/bin/activate
-
                             sonar-scanner \
                                 -Dsonar.projectKey=miapp-flask \
                                 -Dsonar.sources=. \
@@ -75,7 +67,7 @@ pipeline {
                     ssh manuelcollado@192.168.56.106 '
                         docker stop miapp-flask || true
                         docker rm miapp-flask || true
-                        docker run -d --name miapp-flask -p 8081:5000 miapp-flask:latest
+                        docker run -d --name miapp-flask -p 8081:80 miapp-flask:latest
                     '
                 """
             }
@@ -83,10 +75,17 @@ pipeline {
 
         stage('Verificar Despliegue') {
             steps {
-                sh "curl -f http://192.168.56.106:8081 || exit 1"
+                sh """
+                    for i in {1..30}; do
+                        curl -f http://192.168.56.106:8081 && exit 0
+                        echo 'Esperando a que la app arranque...'
+                        sleep 1
+                    done
+                    echo 'La app no respondió en el tiempo esperado' >&2
+                    exit 1
+                """
             }
         }
-
     }
 
     post {
@@ -98,4 +97,3 @@ pipeline {
         }
     }
 }
-
