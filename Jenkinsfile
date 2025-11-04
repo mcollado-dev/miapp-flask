@@ -30,7 +30,7 @@ pipeline {
                     # Ejecutar tests
                     pytest --maxfail=1 --disable-warnings --cov=. --cov-report=term
 
-                    # Generar coverage compatible Sonar (version 1)
+                    # Generar coverage compatible con SonarQube
                     coverage xml -o coverage.xml
                     ls -l coverage.xml
                 '''
