@@ -25,12 +25,10 @@ pipeline {
                     . venv/bin/activate
 
                     pip install --no-cache-dir -r requirements.txt
-                    pip install pytest pytest-cov
+                    pip install pytest pytest-cov coverage
 
-                    # Ejecutamos tests y generamos coverage.xml compatible con SonarQube
-                    pytest --maxfail=1 --disable-warnings --cov=. --cov-report=term --cov-report=xml
-
-                    # Verificamos que se generó coverage.xml
+                    # Ejecutar tests y generar coverage XML compatible con Sonar
+                    pytest --maxfail=1 --disable-warnings --cov=. --cov-report=xml:coverage.xml --cov-report=term
                     ls -l coverage.xml
                 '''
             }
