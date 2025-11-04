@@ -34,8 +34,13 @@
     <canvas id="rolesChart"></canvas>
 </div>
 
-<!-- Incluir Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Incluir Chart.js con integridad (SRI) -->
+<script 
+    src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"
+    integrity="sha384-qRXpHiINwaZjmtxfsfJYtUN58d9Xzj0E1SrW1V3Rm0Fmv4C1W0QDxYQ9RCzMLaAg"
+    crossorigin="anonymous">
+</script>
+
 <script>
 // Generar colores aleatorios para cada rol
 function generarColores(n) {
