@@ -9,25 +9,18 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout') {
-            steps {
-                echo 'Clonando repositorio...'
-                checkout scm
-            }
+            steps { checkout scm }
         }
 
         stage('Run Unit Tests') {
             steps {
-                echo 'Ejecutando tests con cobertura...'
                 sh '''
                     python3 -m venv venv
                     . venv/bin/activate
-
                     pip install --no-cache-dir -r requirements.txt
                     pip install pytest pytest-cov coverage
 
-                    # Ejecutar tests y generar coverage XML compatible con Sonar
                     pytest --maxfail=1 --disable-warnings --cov=. --cov-report=xml:coverage.xml --cov-report=term
                     ls -l coverage.xml
                 '''
@@ -36,29 +29,24 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                echo 'Ejecutando análisis SonarQube...'
                 withSonarQubeEnv('SonarQube-Local') {
-                    script {
-                        def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                        sh """
-                            . venv/bin/activate
-                            ${scannerHome}/bin/sonar-scanner \
-                                -Dsonar.projectKey=miapp-flask \
-                                -Dsonar.sources=. \
-                                -Dsonar.python.version=3 \
-                                -Dsonar.host.url=${SONAR_HOST_URL} \
-                                -Dsonar.login=${SONAR_AUTH_TOKEN} \
-                                -Dsonar.coverageReportPaths=coverage.xml \
-                                -Dsonar.exclusions=venv/**,tests/**  # Excluye virtualenv y tests
-                        """
-                    }
+                    sh '''
+                        . venv/bin/activate
+                        sonar-scanner \
+                            -Dsonar.projectKey=miapp-flask \
+                            -Dsonar.sources=. \
+                            -Dsonar.python.version=3 \
+                            -Dsonar.host.url=${SONAR_HOST_URL} \
+                            -Dsonar.login=${SONAR_AUTH_TOKEN} \
+                            -Dsonar.python.coverage.reportPaths=coverage.xml \
+                            -Dsonar.exclusions=venv/**,tests/**
+                    '''
                 }
             }
         }
 
         stage('Quality Gate') {
             steps {
-                echo 'Esperando resultado del Quality Gate...'
                 timeout(time: 5, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
@@ -66,21 +54,14 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-            steps {
-                echo 'Construyendo imagen Docker local...'
-                sh '''
-                    docker build -t miapp-flask .
-                '''
-            }
+            steps { sh 'docker build -t miapp-flask .' }
         }
 
         stage('Deploy Flask App en remoto') {
             steps {
-                echo "Desplegando contenedor Flask en ${DEPLOY_HOST}..."
                 sh '''
-                    docker save miapp-flask | bzip2 | ssh -o StrictHostKeyChecking=no ${SSH_USER}@${DEPLOY_HOST} 'bunzip2 | docker load'
-
-                    ssh -o StrictHostKeyChecking=no ${SSH_USER}@${DEPLOY_HOST} "
+                    docker save miapp-flask | bzip2 | ssh ${SSH_USER}@${DEPLOY_HOST} 'bunzip2 | docker load'
+                    ssh ${SSH_USER}@${DEPLOY_HOST} "
                         docker stop miapp-flask-container || true
                         docker rm miapp-flask-container || true
                         docker run -d -p ${APP_PORT}:80 --name miapp-flask-container miapp-flask
@@ -91,21 +72,14 @@ pipeline {
 
         stage('Verificar Despliegue') {
             steps {
-                echo "Verificando despliegue remoto en ${DEPLOY_HOST}..."
-                sh '''
-                    sleep 5
-                    ssh -o StrictHostKeyChecking=no ${SSH_USER}@${DEPLOY_HOST} "curl -f http://localhost:${APP_PORT} || exit 1"
-                '''
+                sh "ssh ${SSH_USER}@${DEPLOY_HOST} 'curl -f http://localhost:${APP_PORT}'"
             }
         }
     }
 
     post {
-        success {
-            echo 'Pipeline completado correctamente: análisis SonarQube + despliegue remoto exitoso.'
-        }
-        failure {
-            echo 'Falló el pipeline. Revisa los logs para más detalles.'
-        }
+        success { echo 'Pipeline completado correctamente.' }
+        failure { echo 'Falló el pipeline. Revisa los logs.' }
     }
 }
+
