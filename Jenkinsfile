@@ -7,12 +7,12 @@ pipeline {
         DEPLOY_HOST = '192.168.56.106'
         APP_PORT = '8081'
         CONTAINER_PORT = '80'
-        // Token de SonarQube configurado en Jenkins (ID: sonarqube-token)
         SONAR_AUTH_TOKEN = credentials('sonarqube-token')
     }
 
     stages {
 
+        // 1. Clonar el repositorio
         stage('Checkout') {
             steps {
                 echo 'Clonando repositorio...'
@@ -20,9 +20,10 @@ pipeline {
             }
         }
 
+        // 2. Ejecutar tests con cobertura
         stage('Run Unit Tests') {
             steps {
-                echo 'Ejecutando tests con cobertura en entorno virtual...'
+                echo 'Ejecutando tests con cobertura...'
                 sh '''
                     apt-get update -y && apt-get install -y python3.11-venv
                     python3 -m venv venv
@@ -36,6 +37,7 @@ pipeline {
             }
         }
 
+        // 3. Análisis SonarQube con cobertura
         stage('SonarQube Analysis') {
             steps {
                 echo 'Ejecutando análisis SonarQube...'
@@ -58,6 +60,7 @@ pipeline {
             }
         }
 
+        // 4. Esperar Quality Gate
         stage('Quality Gate') {
             steps {
                 echo 'Esperando resultado del Quality Gate de SonarQube...'
@@ -68,16 +71,18 @@ pipeline {
             }
         }
 
+        // 5. Construcción de la imagen Docker
         stage('Build Docker Image') {
             steps {
-                echo 'Construyendo imagen Docker de Flask...'
+                echo 'Construyendo imagen Docker...'
                 sh "docker build -t ${APP_NAME}:latest ."
             }
         }
 
+        // 6. Despliegue remoto por SSH
         stage('Deploy Flask App') {
             steps {
-                echo "Desplegando aplicación Flask en ${DEPLOY_HOST}..."
+                echo "Desplegando aplicación en ${DEPLOY_HOST}..."
                 sh """
                     docker save ${APP_NAME}:latest | bzip2 | \
                     ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
@@ -92,6 +97,7 @@ pipeline {
             }
         }
 
+        // 7. Verificación del despliegue (corregido con $ escapados)
         stage('Verificar Despliegue') {
             steps {
                 echo 'Verificando que la app responde correctamente...'
@@ -99,10 +105,10 @@ pipeline {
                     ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
                         COUNT=0
                         MAX=15
-                        until curl -s -o /dev/null -w "%{http_code}" http://localhost:${APP_PORT} | grep 200 > /dev/null; do
+                        until curl -s -o /dev/null -w "%{http_code}" http://localhost:\${APP_PORT} | grep 200 > /dev/null; do
                             sleep 2
-                            COUNT=$((COUNT+1))
-                            if [ $COUNT -ge $MAX ]; then
+                            COUNT=\$((COUNT+1))
+                            if [ \$COUNT -ge \$MAX ]; then
                                 echo "Flask no responde después de 30 segundos"
                                 exit 1
                             fi
@@ -123,4 +129,3 @@ pipeline {
         }
     }
 }
-
