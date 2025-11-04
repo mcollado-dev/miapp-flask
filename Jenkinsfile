@@ -2,127 +2,102 @@ pipeline {
     agent { label 'debian-agent' }
 
     environment {
-        APP_NAME = 'miapp-flask'
-        DEPLOY_USER = 'manuelcollado'
-        DEPLOY_HOST = '192.168.56.106'
-        APP_PORT = '8081'
-        CONTAINER_PORT = '80'
+        APP_PORT = "5000"
+        SONAR_HOST_URL = "http://localhost:9000"
         SONAR_AUTH_TOKEN = credentials('sonarqube-token')
     }
 
     stages {
 
-        // 1. Clonar el repositorio
         stage('Checkout') {
             steps {
                 echo 'Clonando repositorio...'
-                checkout scm
+                git branch: 'main', url: 'https://github.com/mcollado-dev/miapp-flask.git'
             }
         }
 
-        // 2. Ejecutar tests con cobertura
         stage('Run Unit Tests') {
             steps {
                 echo 'Ejecutando tests con cobertura...'
                 sh '''
-                    apt-get update -y && apt-get install -y python3.11-venv
+                    # Crear entorno virtual
                     python3 -m venv venv
                     . venv/bin/activate
+
+                    # Instalar dependencias necesarias
                     pip install --no-cache-dir -r requirements.txt
-                    pip install coverage pytest
-                    coverage run -m pytest || true
-                    coverage report -m
-                    coverage xml
+                    pip install pytest pytest-cov
+
+                    # Ejecutar tests y generar el reporte coverage.xml
+                    pytest --maxfail=1 --disable-warnings --cov=. --cov-report=xml:coverage.xml --cov-report=term
+
+                    # Mostrar si el archivo se generó correctamente
+                    ls -l coverage.xml
                 '''
             }
         }
 
-        // 3. Análisis SonarQube con cobertura
         stage('SonarQube Analysis') {
             steps {
                 echo 'Ejecutando análisis SonarQube...'
-                withSonarQubeEnv('SonarQube') {
-                    script {
-                        def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                        sh """
-                            . venv/bin/activate
-                            ${scannerHome}/bin/sonar-scanner \
-                                -Dsonar.projectKey=miapp-flask \
-                                -Dsonar.sources=. \
-                                -Dsonar.python.version=3 \
-                                -Dsonar.python.coverage.reportPaths=coverage.xml \
-                                -Dsonar.host.url=${SONAR_HOST_URL} \
-                                -Dsonar.login=${SONAR_AUTH_TOKEN} \
-                                -Dsonar.exclusions=**/venv/**,**/*.js,**/*.css,**/static/**
-                        """
-                    }
+                withSonarQubeEnv('sonarqube') {
+                    sh '''
+                        . venv/bin/activate
+                        sonar-scanner \
+                            -Dsonar.projectKey=miapp-flask \
+                            -Dsonar.sources=. \
+                            -Dsonar.python.version=3 \
+                            -Dsonar.host.url=${SONAR_HOST_URL} \
+                            -Dsonar.login=${SONAR_AUTH_TOKEN} \
+                            -Dsonar.coverageReportPaths=coverage.xml
+                    '''
                 }
             }
         }
 
-        // 4. Esperar Quality Gate
         stage('Quality Gate') {
             steps {
-                echo 'Esperando resultado del Quality Gate de SonarQube...'
-                script {
-                    def qg = waitForQualityGate()
-                    echo "Resultado del Quality Gate: ${qg.status}"
+                echo 'Esperando resultado del Quality Gate...'
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
 
-        // 5. Construcción de la imagen Docker
         stage('Build Docker Image') {
             steps {
                 echo 'Construyendo imagen Docker...'
-                sh "docker build -t ${APP_NAME}:latest ."
+                sh '''
+                    docker build -t miapp-flask .
+                '''
             }
         }
 
-        // 6. Despliegue remoto por SSH
         stage('Deploy Flask App') {
             steps {
-                echo "Desplegando aplicación en ${DEPLOY_HOST}..."
-                sh """
-                    docker save ${APP_NAME}:latest | bzip2 | \
-                    ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
-                        set -e
-                        bunzip2 | docker load
-                        if docker ps -a --format "{{.Names}}" | grep -Eq "^${APP_NAME}\$"; then
-                            docker rm -f ${APP_NAME}
-                        fi
-                        docker run -d -p ${APP_PORT}:${CONTAINER_PORT} --name ${APP_NAME} ${APP_NAME}:latest
-                    '
-                """
+                echo 'Desplegando aplicación Flask...'
+                sh '''
+                    docker stop miapp-flask-container || true
+                    docker rm miapp-flask-container || true
+                    docker run -d -p ${APP_PORT}:80 --name miapp-flask-container miapp-flask
+                '''
             }
         }
 
-        // 7. Verificación del despliegue (corregido con $ escapados)
         stage('Verificar Despliegue') {
             steps {
-                echo 'Verificando que la app responde correctamente...'
-                sh """
-                    ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} '
-                        COUNT=0
-                        MAX=15
-                        until curl -s -o /dev/null -w "%{http_code}" http://localhost:\${APP_PORT} | grep 200 > /dev/null; do
-                            sleep 2
-                            COUNT=\$((COUNT+1))
-                            if [ \$COUNT -ge \$MAX ]; then
-                                echo "Flask no responde después de 30 segundos"
-                                exit 1
-                            fi
-                        done
-                        echo "App Flask corriendo correctamente"
-                    '
-                """
+                echo 'Verificando despliegue...'
+                sh '''
+                    sleep 5
+                    curl -f http://localhost:${APP_PORT} || exit 1
+                '''
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline completado correctamente: análisis SonarQube, cobertura y despliegue exitoso.'
+            echo 'Pipeline completado correctamente.'
         }
         failure {
             echo 'Falló el pipeline. Revisa los logs para más detalles.'
