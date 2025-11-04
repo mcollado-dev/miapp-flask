@@ -48,13 +48,22 @@ def estadisticas():
     roles_labels = list(roles_count.keys())
     roles_data = list(roles_count.values())
 
+    # Colores seguros y fijos por rol
+    colores_base = [
+        "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0",
+        "#9966FF", "#FF9F40", "#8DD1E1", "#B0DE09"
+    ]
+    roles_colors = [colores_base[i % len(colores_base)] for i in range(len(roles_labels))]
+
     return render_template(
         'estadisticas.html',
         total_usuarios=total_usuarios,
         usuarios=usuarios,
         roles_labels=roles_labels,
-        roles_data=roles_data
+        roles_data=roles_data,
+        roles_colors=roles_colors  # <-- PASAMOS LOS COLORES
     )
+
 
 @app.route('/funciones')
 def funciones():
