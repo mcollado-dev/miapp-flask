@@ -85,3 +85,4 @@ pipeline {
         failure { echo 'Falló el pipeline. Revisa los logs.' }
     }
 }
+
