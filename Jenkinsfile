@@ -39,18 +39,8 @@ pipeline {
 
         stage('Quality Gate') {
             steps {
-                echo 'Esperando resultado del Quality Gate de SonarQube (sin abortar pipeline)...'
-                script {
-                    def qg = waitForQualityGate()
-                    echo "Resultado del Quality Gate: ${qg.status}"
-
-                    // Si el Quality Gate falla, mostrar advertencia pero NO abortar
-                    if (qg.status != 'OK') {
-                        echo "\u001B[31m El análisis de SonarQube no pasó el Quality Gate (${qg.status}). Continuando de todos modos...\u001B[0m"
-                    } else {
-                        echo "\u001B[32m SonarQube aprobó el Quality Gate.\u001B[0m"
-                    }
-                }
+                echo 'Esperando resultado del Quality Gate de SonarQube...'
+                waitForQualityGate abortPipeline: true
             }
         }
 
