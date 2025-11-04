@@ -25,7 +25,7 @@ pipeline {
                     . venv/bin/activate
 
                     pip install --no-cache-dir -r requirements.txt
-                    pip install pytest pytest-cov
+                    pip install pytest pytest-cov coverage==6.5.0
 
                     pytest --maxfail=1 --disable-warnings --cov=. --cov-report=xml:coverage.xml --cov-report=term
                     ls -l coverage.xml
@@ -38,7 +38,6 @@ pipeline {
                 echo 'Ejecutando análisis SonarQube...'
                 withSonarQubeEnv('SonarQube-Local') {
                     script {
-                        // Usamos SonarScanner gestionado por Jenkins
                         def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                         sh """
                             . venv/bin/activate
@@ -49,7 +48,7 @@ pipeline {
                                 -Dsonar.host.url=${SONAR_HOST_URL} \
                                 -Dsonar.login=${SONAR_AUTH_TOKEN} \
                                 -Dsonar.coverageReportPaths=coverage.xml \
-                                -Dsonar.exclusions=venv/**,tests/**  # Excluye virtualenv y tests
+                                -Dsonar.exclusions=venv/**,tests/**
                         """
                     }
                 }
@@ -78,10 +77,8 @@ pipeline {
             steps {
                 echo "Desplegando contenedor Flask en ${DEPLOY_HOST}..."
                 sh '''
-                    # Subir la imagen Docker al host remoto
                     docker save miapp-flask | bzip2 | ssh -o StrictHostKeyChecking=no ${SSH_USER}@${DEPLOY_HOST} 'bunzip2 | docker load'
 
-                    # Detener contenedor anterior y lanzar nuevo
                     ssh -o StrictHostKeyChecking=no ${SSH_USER}@${DEPLOY_HOST} "
                         docker stop miapp-flask-container || true
                         docker rm miapp-flask-container || true
