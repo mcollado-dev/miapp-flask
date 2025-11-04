@@ -2,8 +2,15 @@ pipeline {
     agent { label 'debian-agent' }
 
     environment {
+        # Puerto de la app Flask dentro del contenedor
         APP_PORT = "5000"
+
+        # Dirección del SonarQube
         SONAR_HOST_URL = "http://192.168.56.104:9000"
+
+        # Dirección del servidor remoto donde se desplegará Flask
+        DEPLOY_HOST = "192.168.56.106"
+        SSH_USER = "manuelcollado"
     }
 
     stages {
@@ -60,30 +67,36 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                echo 'Construyendo imagen Docker...'
+                echo 'Construyendo imagen Docker local...'
                 sh '''
                     docker build -t miapp-flask .
                 '''
             }
         }
 
-        stage('Deploy Flask App') {
+        stage('Deploy Flask App en remoto') {
             steps {
-                echo 'Desplegando aplicación Flask...'
+                echo "Desplegando contenedor Flask en ${DEPLOY_HOST}..."
                 sh '''
-                    docker stop miapp-flask-container || true
-                    docker rm miapp-flask-container || true
-                    docker run -d -p ${APP_PORT}:80 --name miapp-flask-container miapp-flask
+                    # Subir la imagen Docker al host remoto
+                    docker save miapp-flask | bzip2 | ssh -o StrictHostKeyChecking=no ${SSH_USER}@${DEPLOY_HOST} 'bunzip2 | docker load'
+
+                    # Detener contenedor anterior si existe y lanzar nuevo
+                    ssh -o StrictHostKeyChecking=no ${SSH_USER}@${DEPLOY_HOST} "
+                        docker stop miapp-flask-container || true
+                        docker rm miapp-flask-container || true
+                        docker run -d -p ${APP_PORT}:80 --name miapp-flask-container miapp-flask
+                    "
                 '''
             }
         }
 
         stage('Verificar Despliegue') {
             steps {
-                echo 'Verificando despliegue...'
+                echo "Verificando despliegue remoto en ${DEPLOY_HOST}..."
                 sh '''
                     sleep 5
-                    curl -f http://localhost:${APP_PORT} || exit 1
+                    ssh -o StrictHostKeyChecking=no ${SSH_USER}@${DEPLOY_HOST} "curl -f http://localhost:${APP_PORT} || exit 1"
                 '''
             }
         }
@@ -91,7 +104,7 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline completado correctamente.'
+            echo 'Pipeline completado correctamente: análisis SonarQube + despliegue remoto exitoso.'
         }
         failure {
             echo 'Falló el pipeline. Revisa los logs para más detalles.'
