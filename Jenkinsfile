@@ -29,7 +29,8 @@ pipeline {
                                 -Dsonar.sources=. \
                                 -Dsonar.host.url=${SONAR_HOST_URL} \
                                 -Dsonar.login=${SONAR_AUTH_TOKEN} \
-                                -Dsonar.exclusions=**/*.js,**/*.css,**/static/** \
+                                -Dsonar.python.version=3 \
+                                -Dsonar.exclusions=**/*.js,**/*.css,**/static/**,**/node_modules/** \
                                 -Dsonar.verbose=true
                         """
                     }
