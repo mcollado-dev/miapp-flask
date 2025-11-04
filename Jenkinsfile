@@ -2,12 +2,8 @@ pipeline {
     agent { label 'debian-agent' }
 
     environment {
-        // Puerto de la app Flask
         APP_PORT = "5000"
-
-        // Configuración SonarQube
-        SONAR_HOST_URL = "http://localhost:9000"
-        SONAR_AUTH_TOKEN = credentials('sonarqube-token')  // ID de credencial en Jenkins
+        SONAR_HOST_URL = "http://192.168.56.104:9000"
     }
 
     stages {
@@ -23,18 +19,13 @@ pipeline {
             steps {
                 echo 'Ejecutando tests con cobertura...'
                 sh '''
-                    # Crear entorno virtual
                     python3 -m venv venv
                     . venv/bin/activate
 
-                    # Instalar dependencias necesarias
                     pip install --no-cache-dir -r requirements.txt
                     pip install pytest pytest-cov
 
-                    # Ejecutar tests y generar el reporte coverage.xml
                     pytest --maxfail=1 --disable-warnings --cov=. --cov-report=xml:coverage.xml --cov-report=term
-
-                    # Verificar que el archivo de cobertura se generó correctamente
                     ls -l coverage.xml
                 '''
             }
@@ -43,7 +34,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 echo 'Ejecutando análisis SonarQube...'
-                withSonarQubeEnv('SonarQube-Local') {  // Debe coincidir con el nombre configurado en Jenkins
+                withSonarQubeEnv('SonarQube-Local') {
                     sh '''
                         . venv/bin/activate
                         sonar-scanner \
