@@ -48,7 +48,8 @@ pipeline {
                                 -Dsonar.python.version=3 \
                                 -Dsonar.host.url=${SONAR_HOST_URL} \
                                 -Dsonar.login=${SONAR_AUTH_TOKEN} \
-                                -Dsonar.coverageReportPaths=coverage.xml
+                                -Dsonar.coverageReportPaths=coverage.xml \
+                                -Dsonar.exclusions=venv/**,tests/**  # Excluye virtualenv y tests
                         """
                     }
                 }
@@ -110,3 +111,4 @@ pipeline {
         }
     }
 }
+
