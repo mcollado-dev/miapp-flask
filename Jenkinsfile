@@ -25,7 +25,7 @@ pipeline {
                     . venv/bin/activate
 
                     pip install --no-cache-dir -r requirements.txt
-                    pip install pytest pytest-cov coverage==6.5.0
+                    pip install pytest pytest-cov
 
                     pytest --maxfail=1 --disable-warnings --cov=. --cov-report=xml:coverage.xml --cov-report=term
                     ls -l coverage.xml
@@ -48,7 +48,7 @@ pipeline {
                                 -Dsonar.host.url=${SONAR_HOST_URL} \
                                 -Dsonar.login=${SONAR_AUTH_TOKEN} \
                                 -Dsonar.coverageReportPaths=coverage.xml \
-                                -Dsonar.exclusions=venv/**,tests/**
+                                -Dsonar.exclusions=venv/**,tests/**,**/*.js,**/*.css  # Excluye virtualenv, tests y JS/CSS
                         """
                     }
                 }
@@ -108,4 +108,3 @@ pipeline {
         }
     }
 }
-
