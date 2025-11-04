@@ -66,7 +66,7 @@ pipeline {
         stage('Deploy Flask App en remoto') {
             steps {
                 sh """
-                    ssh user@remote-server '
+                    ssh manuelcollado@192.168.6.106 '
                         docker stop miapp-flask || true
                         docker rm miapp-flask || true
                         docker run -d --name miapp-flask -p 5000:5000 miapp-flask:latest
