@@ -30,8 +30,8 @@
 
 <!-- Gráfico circular centrado y tamaño controlado -->
 <h3 class="mt-4 text-center">Distribución de roles</h3>
-<div style="max-width: 350px; margin: auto; height: 350px;">
-    <canvas id="rolesChart"></canvas>
+<div style="max-width: 350px; margin: auto;">
+    <canvas id="rolesChart" width="350" height="350"></canvas>
 </div>
 
 <!-- Incluir Chart.js con integridad (SRI) -->
@@ -42,57 +42,60 @@
 </script>
 
 <script>
-// Generar colores aleatorios para cada rol
-function generarColores(n) {
-    const colores = [];
-    for (let i = 0; i < n; i++) {
-        const r = Math.floor(Math.random() * 255);
-        const g = Math.floor(Math.random() * 255);
-        const b = Math.floor(Math.random() * 255);
-        colores.push(`rgba(${r}, ${g}, ${b}, 0.6)`);
+document.addEventListener('DOMContentLoaded', () => {
+    // Generar colores aleatorios para cada rol
+    function generarColores(n) {
+        const colores = [];
+        for (let i = 0; i < n; i++) {
+            const r = Math.floor(Math.random() * 255);
+            const g = Math.floor(Math.random() * 255);
+            const b = Math.floor(Math.random() * 255);
+            colores.push(`rgba(${r}, ${g}, ${b}, 0.6)`);
+        }
+        return colores;
     }
-    return colores;
-}
 
-// Configuración del gráfico
-const ctx = document.getElementById('rolesChart').getContext('2d');
-const rolesChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-        labels: {{ roles_labels|tojson }},
-        datasets: [{
-            label: 'Usuarios por rol',
-            data: {{ roles_data|tojson }},
-            backgroundColor: generarColores({{ roles_labels|length }}),
-            borderColor: 'rgba(255, 255, 255, 0.8)',
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'bottom',
-                labels: {
-                    boxWidth: 20,
-                    padding: 15
-                }
-            },
-            tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        const label = context.label || '';
-                        const value = context.raw || 0;
-                        return `${label}: ${value} usuario(s)`;
+    // Configuración del gráfico
+    const ctx = document.getElementById('rolesChart').getContext('2d');
+    const rolesChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: {{ roles_labels|tojson }},
+            datasets: [{
+                label: 'Usuarios por rol',
+                data: {{ roles_data|tojson }},
+                backgroundColor: generarColores({{ roles_labels|length }}),
+                borderColor: 'rgba(255, 255, 255, 0.8)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 20,
+                        padding: 15
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            return `${label}: ${value} usuario(s)`;
+                        }
                     }
                 }
             }
         }
-    }
+    });
 });
 </script>
 {% endblock %}
+
 
 
 
