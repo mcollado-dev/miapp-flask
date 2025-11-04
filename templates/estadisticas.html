@@ -37,16 +37,11 @@
 <!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous"></script>
 
-<!-- Datos seguros pasados desde Flask -->
 <script>
+    // Datos seguros pasados desde Flask
     const rolesLabels = {{ roles_labels|default([])|tojson|safe }};
     const rolesData = {{ roles_data|default([])|tojson|safe }};
     const rolesColors = {{ roles_colors|default([])|tojson|safe }};
-
-    // Depuración opcional
-    console.log("Roles:", rolesLabels);
-    console.log("Data:", rolesData);
-    console.log("Colors:", rolesColors);
 
     const ctx = document.getElementById('rolesChart').getContext('2d');
 
