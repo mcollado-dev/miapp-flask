@@ -6,6 +6,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout SCM') {
             steps {
                 checkout scm
@@ -14,13 +15,17 @@ pipeline {
 
         stage('Run Unit Tests') {
             steps {
-                // Crear y activar entorno virtual
                 sh """
+                    # Crear y activar entorno virtual
                     python3 -m venv ${VENV_DIR}
                     . ${VENV_DIR}/bin/activate
+
+                    # Instalar dependencias
                     pip install --upgrade pip
                     pip install -r requirements.txt
                     pip install pytest pytest-cov coverage
+
+                    # Ejecutar tests con cobertura
                     pytest --maxfail=1 --disable-warnings --cov=. --cov-report=xml:coverage.xml --cov-report=term
                 """
             }
@@ -35,6 +40,7 @@ pipeline {
                         sh """
                             export PATH=${scannerHome}/bin:\$PATH
                             . ${VENV_DIR}/bin/activate
+
                             sonar-scanner \
                                 -Dsonar.projectKey=miapp-flask \
                                 -Dsonar.sources=. \
@@ -69,7 +75,7 @@ pipeline {
                     ssh manuelcollado@192.168.56.106 '
                         docker stop miapp-flask || true
                         docker rm miapp-flask || true
-                        docker run -d --name miapp-flask -p 5000:5000 miapp-flask:latest
+                        docker run -d --name miapp-flask -p 8081:5000 miapp-flask:latest
                     '
                 """
             }
@@ -77,9 +83,10 @@ pipeline {
 
         stage('Verificar Despliegue') {
             steps {
-                sh "curl -f http://remote-server:5000 || exit 1"
+                sh "curl -f http://192.168.56.106:8081 || exit 1"
             }
         }
+
     }
 
     post {
@@ -91,3 +98,4 @@ pipeline {
         }
     }
 }
+
