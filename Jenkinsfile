@@ -1,21 +1,19 @@
 pipeline {
     agent { label 'debian-agent' }
 
-    tools {
-        sonarRunner 'SonarScanner' // <-- nombre de la instalación de Jenkins
-    }
-
     environment {
         APP_PORT = "5000"
         SONAR_HOST_URL = "http://192.168.56.104:9000"
-        SONAR_AUTH_TOKEN = credentials('sonar-token') // define esto en Jenkins
+        SONAR_AUTH_TOKEN = credentials('sonar-token') // token seguro de Jenkins
         DEPLOY_HOST = "192.168.56.106"
         SSH_USER = "manuelcollado"
     }
 
     stages {
         stage('Checkout') {
-            steps { checkout scm }
+            steps {
+                checkout scm
+            }
         }
 
         stage('Run Unit Tests') {
@@ -57,7 +55,9 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-            steps { sh 'docker build -t miapp-flask .' }
+            steps {
+                sh 'docker build -t miapp-flask .'
+            }
         }
 
         stage('Deploy Flask App en remoto') {
@@ -85,4 +85,3 @@ pipeline {
         failure { echo 'Falló el pipeline. Revisa los logs.' }
     }
 }
-
