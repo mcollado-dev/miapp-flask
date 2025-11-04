@@ -2,12 +2,13 @@ pipeline {
     agent { label 'debian-agent' }
 
     tools {
-        sonarQubeScanner 'SonarScanner' // el nombre que pusiste en Jenkins Global Tool Configuration
+        sonarRunner 'SonarScanner' // <-- nombre de la instalación de Jenkins
     }
 
     environment {
         APP_PORT = "5000"
         SONAR_HOST_URL = "http://192.168.56.104:9000"
+        SONAR_AUTH_TOKEN = credentials('sonar-token') // define esto en Jenkins
         DEPLOY_HOST = "192.168.56.106"
         SSH_USER = "manuelcollado"
     }
