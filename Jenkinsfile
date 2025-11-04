@@ -13,7 +13,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Clonando repositorio...'
-                git branch: 'main', url: 'https://github.com/mcollado-dev/miapp-flask.git'
+                checkout scm
             }
         }
 
@@ -37,16 +37,20 @@ pipeline {
             steps {
                 echo 'Ejecutando análisis SonarQube...'
                 withSonarQubeEnv('SonarQube-Local') {
-                    sh '''
-                        . venv/bin/activate
-                        sonar-scanner \
-                            -Dsonar.projectKey=miapp-flask \
-                            -Dsonar.sources=. \
-                            -Dsonar.python.version=3 \
-                            -Dsonar.host.url=$SONAR_HOST_URL \
-                            -Dsonar.login=$SONAR_AUTH_TOKEN \
-                            -Dsonar.coverageReportPaths=coverage.xml
-                    '''
+                    script {
+                        // Usamos SonarScanner gestionado por Jenkins
+                        def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                        sh """
+                            . venv/bin/activate
+                            ${scannerHome}/bin/sonar-scanner \
+                                -Dsonar.projectKey=miapp-flask \
+                                -Dsonar.sources=. \
+                                -Dsonar.python.version=3 \
+                                -Dsonar.host.url=${SONAR_HOST_URL} \
+                                -Dsonar.login=${SONAR_AUTH_TOKEN} \
+                                -Dsonar.coverageReportPaths=coverage.xml
+                        """
+                    }
                 }
             }
         }
@@ -54,7 +58,7 @@ pipeline {
         stage('Quality Gate') {
             steps {
                 echo 'Esperando resultado del Quality Gate...'
-                timeout(time: 2, unit: 'MINUTES') {
+                timeout(time: 5, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
             }
@@ -76,7 +80,7 @@ pipeline {
                     # Subir la imagen Docker al host remoto
                     docker save miapp-flask | bzip2 | ssh -o StrictHostKeyChecking=no ${SSH_USER}@${DEPLOY_HOST} 'bunzip2 | docker load'
 
-                    # Detener contenedor anterior si existe y lanzar nuevo
+                    # Detener contenedor anterior y lanzar nuevo
                     ssh -o StrictHostKeyChecking=no ${SSH_USER}@${DEPLOY_HOST} "
                         docker stop miapp-flask-container || true
                         docker rm miapp-flask-container || true
