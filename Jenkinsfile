@@ -27,10 +27,10 @@ pipeline {
                     pip install --no-cache-dir -r requirements.txt
                     pip install pytest pytest-cov coverage
 
-                    # Ejecutar tests con cobertura
+                    # Ejecutar tests
                     pytest --maxfail=1 --disable-warnings --cov=. --cov-report=term
 
-                    # Generar coverage.xml compatible con Sonar
+                    # Generar coverage compatible Sonar (version 1)
                     coverage xml -o coverage.xml
                     ls -l coverage.xml
                 '''
@@ -52,7 +52,7 @@ pipeline {
                                 -Dsonar.host.url=${SONAR_HOST_URL} \
                                 -Dsonar.login=${SONAR_AUTH_TOKEN} \
                                 -Dsonar.coverageReportPaths=coverage.xml \
-                                -Dsonar.exclusions=venv/**,tests/**  # Excluye virtualenv y tests
+                                -Dsonar.exclusions=venv/**,tests/**
                         """
                     }
                 }
