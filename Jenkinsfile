@@ -25,13 +25,13 @@ pipeline {
                     . venv/bin/activate
 
                     pip install --no-cache-dir -r requirements.txt
-                    pip install pytest pytest-cov coverage
+                    pip install pytest pytest-cov
 
-                    # Ejecutar tests
                     pytest --maxfail=1 --disable-warnings --cov=. --cov-report=term
 
-                    # Generar coverage compatible con SonarQube
-                    coverage xml -o coverage.xml
+                    # Generamos coverage.xml compatible con versiones antiguas de SonarQube
+                    coverage xml --datafile=.coverage --skip-empty
+
                     ls -l coverage.xml
                 '''
             }
@@ -42,6 +42,7 @@ pipeline {
                 echo 'Ejecutando análisis SonarQube...'
                 withSonarQubeEnv('SonarQube-Local') {
                     script {
+                        // Usamos SonarScanner gestionado por Jenkins
                         def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                         sh """
                             . venv/bin/activate
@@ -112,3 +113,4 @@ pipeline {
         }
     }
 }
+
