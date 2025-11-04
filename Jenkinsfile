@@ -2,13 +2,8 @@ pipeline {
     agent { label 'debian-agent' }
 
     environment {
-        # Puerto de la app Flask dentro del contenedor
         APP_PORT = "5000"
-
-        # Dirección del SonarQube
         SONAR_HOST_URL = "http://192.168.56.104:9000"
-
-        # Dirección del servidor remoto donde se desplegará Flask
         DEPLOY_HOST = "192.168.56.106"
         SSH_USER = "manuelcollado"
     }
