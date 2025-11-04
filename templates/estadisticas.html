@@ -31,7 +31,7 @@
 <!-- Gráfico circular -->
 <h3 class="mt-4 text-center">Distribución de roles</h3>
 <div style="max-width: 400px; margin: auto; height: 400px;">
-    <canvas id="rolesChart" style="width:100%; height:100%;"></canvas>
+    <canvas id="rolesChart"></canvas>
 </div>
 
 <!-- Chart.js CDN con SRI -->
@@ -42,15 +42,15 @@
 </script>
 
 <script>
+document.addEventListener('DOMContentLoaded', () => {
     // Datos seguros pasados desde Flask
     const rolesLabels = {{ roles_labels|default([])|tojson|safe }};
     const rolesData = {{ roles_data|default([])|tojson|safe }};
     const rolesColors = {{ roles_colors|default([])|tojson|safe }};
 
-    // Canvas
+    // Crear gráfico
     const ctx = document.getElementById('rolesChart').getContext('2d');
 
-    // Gráfico circular
     new Chart(ctx, {
         type: 'pie',
         data: {
@@ -84,9 +84,6 @@
             }
         }
     });
+});
 </script>
 {% endblock %}
-
-
-
-
