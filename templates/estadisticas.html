@@ -5,7 +5,6 @@
 
 <p>Total de usuarios: <strong>{{ total_usuarios }}</strong></p>
 
-<!-- Tabla de usuarios -->
 <table class="table table-striped table-hover" aria-label="Listado de usuarios registrados">
     <caption>Listado de todos los usuarios registrados con su ID, nombre, email y rol</caption>
     <thead class="table-dark">
@@ -28,19 +27,9 @@
     </tbody>
 </table>
 
-<!-- Gráfico generado con Matplotlib -->
 <h3 class="mt-4 text-center">Distribución de roles</h3>
-<div class="text-center mt-3">
-    {% if grafico_base64 %}
-        <img src="data:image/png;base64,{{ grafico_base64 }}" 
-             alt="Gráfico de distribución de roles" 
-             class="img-fluid rounded shadow-lg border border-light">
-        <p class="text-muted mt-2">
-            Gráfico generado automáticamente según los roles actuales en la base de datos.
-        </p>
-    {% else %}
-        <p class="text-danger">No se pudo generar el gráfico.</p>
-    {% endif %}
+
+<div class="text-center">
+    <img src="data:image/png;base64,{{ grafico_base64 }}" alt="Gráfico de roles" class="img-fluid rounded shadow">
 </div>
 {% endblock %}
-
