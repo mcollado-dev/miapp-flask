@@ -57,7 +57,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t miapp-flask:latest .'
+                sh 'docker build --no-cache -t miapp-flask:latest .'
             }
         }
 
