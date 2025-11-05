@@ -64,6 +64,7 @@ pipeline {
         stage('Deploy Flask App en remoto') {
             steps {
                 sh """
+                    docker save miapp-flask:latest | bzip2 | ssh manuelcollado@192.168.56.106 'bunzip2 | docker load'
                     ssh manuelcollado@192.168.56.106 '
                         docker stop miapp-flask || true
                         docker rm miapp-flask || true
