@@ -81,6 +81,10 @@ def funciones():
 def documentacion():
     return render_template('documentacion.html')
 
+@app.route('/detalles')
+def detalles():
+    return render_template('detalles.html')
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)
