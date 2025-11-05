@@ -5,6 +5,7 @@
 
 <p>Total de usuarios: <strong>{{ total_usuarios }}</strong></p>
 
+<!-- Tabla de usuarios -->
 <table class="table table-striped table-hover" aria-label="Listado de usuarios registrados">
     <caption>Listado de todos los usuarios registrados con su ID, nombre, email y rol</caption>
     <thead class="table-dark">
@@ -27,74 +28,19 @@
     </tbody>
 </table>
 
+<!-- Gráfico generado con Matplotlib -->
 <h3 class="mt-4 text-center">Distribución de roles</h3>
-<div style="max-width: 700px; margin: auto; height: 400px;">
-    <canvas id="rolesChart"></canvas>
+<div class="text-center mt-3">
+    {% if grafico_base64 %}
+        <img src="data:image/png;base64,{{ grafico_base64 }}" 
+             alt="Gráfico de distribución de roles" 
+             class="img-fluid rounded shadow-lg border border-light">
+        <p class="text-muted mt-2">
+            Gráfico generado automáticamente según los roles actuales en la base de datos.
+        </p>
+    {% else %}
+        <p class="text-danger">No se pudo generar el gráfico.</p>
+    {% endif %}
 </div>
-
-<script 
-    src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"
-    integrity="sha384-qRXpHiINwaZjmtxfsfJYtUN58d9Xzj0E1SrW1V3Rm0Fmv4C1W0QDxYQ9RCzMLaAg"
-    crossorigin="anonymous">
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const rolesLabels = {{ roles_labels|default([])|tojson|safe }};
-    const rolesData = {{ roles_data|default([])|tojson|safe }};
-
-    const rolesColors = rolesLabels.map(() => {
-        const r = Math.floor(Math.random() * 200 + 30);
-        const g = Math.floor(Math.random() * 200 + 30);
-        const b = Math.floor(Math.random() * 200 + 30);
-        return `rgba(${r}, ${g}, ${b}, 0.7)`;
-    });
-
-    const ctx = document.getElementById('rolesChart').getContext('2d');
-
-    new Chart(ctx, {
-        type: 'bar', // Gráfico de barras horizontal
-        data: {
-            labels: rolesLabels,
-            datasets: [{
-                label: 'Usuarios por rol',
-                data: rolesData,
-                backgroundColor: rolesColors,
-                borderColor: 'rgba(255, 255, 255, 0.8)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            indexAxis: 'y', // horizontal
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Número de usuarios'
-                    }
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'Roles'
-                    }
-                }
-            },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return `${context.label}: ${context.raw} usuario(s)`;
-                        }
-                    }
-                }
-            }
-        }
-    });
-});
-</script>
 {% endblock %}
+
