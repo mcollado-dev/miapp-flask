@@ -1,13 +1,51 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2 class="text-warning mb-4">Documentación</h2>
-<p>Esta aplicación está desarrollada en <strong>Flask</strong> y desplegada con <strong>Docker</strong> y <strong>Jenkins</strong>.</p>
-<p>Incluye:</p>
-<ul>
-    <li>Páginas separadas para estadísticas, funciones y documentación.</li>
-    <li>Base de datos SQLite para almacenar usuarios.</li>
-    <li>Pipeline de despliegue automático con verificación de la aplicación.</li>
-</ul>
+<div class="container mt-4">
+    <h2 class="text-warning mb-4">Documentación de la Aplicación</h2>
+    <p>Esta aplicación está desarrollada en <strong>Flask</strong>, con despliegue automatizado mediante <strong>Docker</strong> y <strong>Jenkins</strong>.</p>
+
+    <h4 class="mt-4 text-secondary">Estructura del Proyecto</h4>
+    <ul>
+        <li><strong>app.py:</strong> Archivo principal de la aplicación Flask.</li>
+        <li><strong>models.py:</strong> Contiene el modelo de datos <code>Usuario</code>.</li>
+        <li><strong>templates/:</strong> Carpeta con las páginas HTML renderizadas por Flask.</li>
+        <li><strong>static/:</strong> Carpeta para archivos estáticos como hojas de estilo CSS, imágenes o scripts.</li>
+        <li><strong>requirements.txt:</strong> Lista de dependencias del proyecto.</li>
+        <li><strong>Jenkinsfile:</strong> Define el pipeline CI/CD completo.</li>
+        <li><strong>Dockerfile:</strong> Instrucciones para construir la imagen Docker.</li>
+    </ul>
+
+    <h4 class="mt-4 text-secondary">Tecnologías Utilizadas</h4>
+    <ul>
+        <li><strong>Flask:</strong> Framework web ligero en Python.</li>
+        <li><strong>SQLAlchemy:</strong> ORM para la base de datos SQLite.</li>
+        <li><strong>Matplotlib:</strong> Generación de gráficos en la sección de estadísticas.</li>
+        <li><strong>Jenkins:</strong> Automatización del proceso de testing, análisis y despliegue.</li>
+        <li><strong>SonarQube:</strong> Análisis de calidad del código y métricas.</li>
+        <li><strong>Docker:</strong> Contenedorización y despliegue.</li>
+    </ul>
+
+    <h4 class="mt-4 text-secondary">Pipeline de Despliegue</h4>
+    <p>El pipeline de Jenkins realiza los siguientes pasos:</p>
+    <ol>
+        <li>Descarga del código fuente desde el repositorio.</li>
+        <li>Ejecución de tests unitarios con Pytest.</li>
+        <li>Análisis de calidad con SonarQube.</li>
+        <li>Construcción y despliegue del contenedor Docker.</li>
+        <li>Verificación automática del despliegue en el servidor remoto.</li>
+    </ol>
+
+    <h4 class="mt-4 text-secondary">Cómo Ejecutar Localmente</h4>
+    <pre><code>python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+flask run</code></pre>
+
+    <p class="mt-4">Para acceder a la aplicación en el navegador, entra en:
+        <code>http://192.168.56.106:8081</code>
+    </p>
+</div>
 {% endblock %}
+
 
