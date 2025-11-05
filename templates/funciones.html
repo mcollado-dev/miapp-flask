@@ -1,12 +1,30 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2 class="text-success mb-4">Funciones Disponibles</h2>
-<ul class="list-group">
-    <li class="list-group-item">Función 1: Gestión de usuarios</li>
-    <li class="list-group-item">Función 2: Generación de estadísticas</li>
-    <li class="list-group-item">Función 3: Exportación de datos</li>
-    <li class="list-group-item">Función 4: Configuración de la app</li>
-</ul>
+<div class="container mt-4">
+    <h2 class="text-success mb-4">Funciones Disponibles</h2>
+
+    <p>Esta sección describe las principales funcionalidades implementadas en la aplicación Flask, junto con sus objetivos y comportamiento dentro del sistema.</p>
+
+    <h4 class="mt-4 text-secondary">Gestión de Usuarios</h4>
+    <p>Permite crear, consultar y listar los usuarios almacenados en la base de datos SQLite. Cada usuario tiene un nombre, un correo electrónico y un rol asignado.</p>
+
+    <h4 class="mt-4 text-secondary">Generación de Estadísticas</h4>
+    <p>Utiliza la librería <strong>Matplotlib</strong> para generar gráficos dinámicos en formato base64, mostrando la distribución de roles entre los usuarios registrados.</p>
+
+    <h4 class="mt-4 text-secondary">Exportación y Análisis de Datos</h4>
+    <p>El sistema está preparado para incorporar funciones de exportación de datos (por ejemplo, a CSV o PDF) y análisis estadístico avanzado de los registros almacenados.</p>
+
+    <h4 class="mt-4 text-secondary">Configuración y Personalización</h4>
+    <p>La aplicación incluye opciones configurables mediante variables de entorno y archivos de configuración para adaptar el despliegue a distintos entornos (desarrollo, pruebas o producción).</p>
+
+    <h4 class="mt-4 text-secondary">Despliegue Automatizado</h4>
+    <p>Integración con <strong>Jenkins</strong> y <strong>Docker</strong> para construir, analizar y desplegar automáticamente la aplicación tras cada commit en el repositorio.</p>
+
+    <div class="mt-5">
+        <a href="{{ url_for('home') }}" class="btn btn-secondary">Volver al inicio</a>
+    </div>
+</div>
 {% endblock %}
+
 
