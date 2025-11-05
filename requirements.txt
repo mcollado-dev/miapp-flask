@@ -1,7 +1,21 @@
+# Flask: framework principal para crear la aplicación web
 flask==3.1.2
+
+# Gunicorn: servidor WSGI para desplegar la app Flask en producción
 gunicorn==21.2.0
+
+# Flask-SQLAlchemy: extensión de Flask para manejar la base de datos con SQLAlchemy
 flask_sqlalchemy==3.1.1
+
+# Pytest: herramienta de testing para ejecutar las pruebas unitarias
 pytest
+
+# Pytest-cov: plugin de pytest para generar informes de cobertura del código
 pytest-cov
+
+# Matplotlib: librería para crear gráficos (se usa en la página de estadísticas)
 matplotlib
+
+
+
 
