@@ -17,8 +17,8 @@ app = Flask(__name__)
 # ----------------------------
 # CONFIGURACIÓN DE LA BASE DE DATOS
 # ----------------------------
-# Usamos SQLite como base de datos local
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///miapp.db'
+# Usamos MariaDB como base de datos real
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://flaskuser:TU_CONTRASEÑA@192.168.56.105/miappdb'
 
 # Desactivamos el seguimiento de modificaciones para mejorar el rendimiento
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -122,4 +122,5 @@ def detalles():
 if __name__ == '__main__':
     # Ejecutamos la aplicación Flask en el puerto 80, accesible desde cualquier IP
     app.run(host='0.0.0.0', port=80)
+
 
