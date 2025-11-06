@@ -4,27 +4,44 @@
 <div class="container mt-4">
     <h2 class="text-success mb-4">Funciones Disponibles</h2>
 
-    <p>Esta sección describe las principales funcionalidades implementadas en la aplicación Flask, junto con sus objetivos y comportamiento dentro del sistema.</p>
+    <p>Esta sección describe las principales funcionalidades implementadas en la aplicación <strong>Flask</strong>, así como su propósito dentro del flujo general del sistema y del pipeline de despliegue automatizado.</p>
 
     <h4 class="mt-4 text-secondary">Gestión de Usuarios</h4>
-    <p>Permite crear, consultar y listar los usuarios almacenados en la base de datos SQLite. Cada usuario tiene un nombre, un correo electrónico y un rol asignado.</p>
+    <p>La aplicación implementa un modelo de datos <code>Usuario</code> gestionado mediante <strong>SQLAlchemy</strong> y almacenado en una base de datos <strong>MariaDB</strong> externa. 
+    Cada registro contiene un nombre, un correo electrónico y un rol asociado. 
+    Esta estructura permite una gestión de usuarios flexible y persistente en un entorno real, eliminando la dependencia de bases de datos locales de prueba.</p>
 
     <h4 class="mt-4 text-secondary">Generación de Estadísticas</h4>
-    <p>Utiliza la librería <strong>Matplotlib</strong> para generar gráficos dinámicos en formato base64, mostrando la distribución de roles entre los usuarios registrados.</p>
+    <p>La aplicación incorpora una sección de estadísticas que emplea <strong>Matplotlib</strong> para generar gráficos dinámicos en formato <em>base64</em>. 
+    Estos gráficos muestran la distribución de roles entre los usuarios y se renderizan directamente en la interfaz HTML sin necesidad de archivos físicos. 
+    El proceso está totalmente automatizado y optimizado para entornos web.</p>
 
     <h4 class="mt-4 text-secondary">Exportación y Análisis de Datos</h4>
-    <p>El sistema está preparado para incorporar funciones de exportación de datos (por ejemplo, a CSV o PDF) y análisis estadístico avanzado de los registros almacenados.</p>
+    <p>El sistema está preparado para futuras extensiones que permitirán exportar información de usuarios y métricas en formatos como <strong>CSV</strong> o <strong>PDF</strong>. 
+    También admite el desarrollo de módulos analíticos más avanzados que procesen los datos directamente desde la base de datos <strong>MariaDB</strong> para obtener métricas de actividad o segmentaciones personalizadas.</p>
 
-    <h4 class="mt-4 text-secondary">Configuración y Personalización</h4>
-    <p>La aplicación incluye opciones configurables mediante variables de entorno y archivos de configuración para adaptar el despliegue a distintos entornos (desarrollo, pruebas o producción).</p>
+    <h4 class="mt-4 text-secondary">Configuración y Seguridad</h4>
+    <p>La aplicación utiliza variables de entorno y configuraciones específicas según el entorno (<code>development</code>, <code>testing</code> o <code>production</code>). 
+    La conexión con la base de datos se gestiona de forma segura a través de una credencial protegida en <strong>Jenkins</strong>, 
+    evitando almacenar contraseñas en el código fuente. 
+    Esto mejora la seguridad y permite una integración profesional con los pipelines de CI/CD.</p>
 
     <h4 class="mt-4 text-secondary">Despliegue Automatizado</h4>
-    <p>Integración con <strong>Jenkins</strong> y <strong>Docker</strong> para construir, analizar y desplegar automáticamente la aplicación tras cada commit en el repositorio.</p>
+    <p>El proceso de despliegue está completamente automatizado mediante <strong>Jenkins</strong> y <strong>Docker</strong>. 
+    El pipeline realiza las siguientes operaciones:</p>
+    <ul>
+        <li>Descarga el código fuente y ejecuta los tests unitarios.</li>
+        <li>Analiza la calidad del código con <strong>SonarQube</strong>.</li>
+        <li>Construye la imagen Docker de la aplicación Flask.</li>
+        <li>Verifica la conexión con la base de datos <strong>MariaDB</strong> mediante una credencial segura.</li>
+        <li>Despliega la aplicación en el servidor remoto <code>192.168.56.106</code> y valida su disponibilidad.</li>
+    </ul>
+
+    <p>Gracias a esta integración, cada actualización del repositorio puede ser probada, analizada y desplegada automáticamente, 
+    garantizando un flujo de entrega continua y un entorno de producción controlado.</p>
 
     <div class="mt-5">
         <a href="{{ url_for('home') }}" class="btn btn-secondary">Volver al inicio</a>
     </div>
 </div>
 {% endblock %}
-
-
