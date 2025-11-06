@@ -7,33 +7,38 @@
 
     <h4 class="mt-4 text-secondary">Estructura del Proyecto</h4>
     <ul>
-        <li><strong>app.py:</strong> Archivo principal de la aplicación Flask.</li>
-        <li><strong>models.py:</strong> Contiene el modelo de datos <code>Usuario</code>.</li>
+        <li><strong>app.py:</strong> Archivo principal de la aplicación Flask, configurado para conectarse a una base de datos <strong>MariaDB</strong> externa.</li>
+        <li><strong>models.py:</strong> Contiene el modelo de datos <code>Usuario</code> y la configuración de SQLAlchemy.</li>
         <li><strong>templates/:</strong> Carpeta con las páginas HTML renderizadas por Flask.</li>
         <li><strong>static/:</strong> Carpeta para archivos estáticos como hojas de estilo CSS, imágenes o scripts.</li>
-        <li><strong>requirements.txt:</strong> Lista de dependencias del proyecto.</li>
-        <li><strong>Jenkinsfile:</strong> Define el pipeline CI/CD completo.</li>
-        <li><strong>Dockerfile:</strong> Instrucciones para construir la imagen Docker.</li>
+        <li><strong>requirements.txt:</strong> Lista de dependencias del proyecto (incluye <code>pymysql</code> para conectar Flask con MariaDB).</li>
+        <li><strong>Jenkinsfile:</strong> Define el pipeline CI/CD completo con verificación de conexión a la base de datos mediante credencial segura.</li>
+        <li><strong>Dockerfile:</strong> Instrucciones para construir la imagen Docker de la aplicación.</li>
     </ul>
 
     <h4 class="mt-4 text-secondary">Tecnologías Utilizadas</h4>
     <ul>
         <li><strong>Flask:</strong> Framework web ligero en Python.</li>
-        <li><strong>SQLAlchemy:</strong> ORM para la base de datos SQLite.</li>
+        <li><strong>SQLAlchemy:</strong> ORM para la gestión de datos.</li>
+        <li><strong>MariaDB:</strong> Base de datos relacional externa, más segura y persistente que SQLite.</li>
+        <li><strong>PyMySQL:</strong> Conector utilizado por Flask para comunicarse con MariaDB.</li>
         <li><strong>Matplotlib:</strong> Generación de gráficos en la sección de estadísticas.</li>
-        <li><strong>Jenkins:</strong> Automatización del proceso de testing, análisis y despliegue.</li>
-        <li><strong>SonarQube:</strong> Análisis de calidad del código y métricas.</li>
-        <li><strong>Docker:</strong> Contenedorización y despliegue.</li>
+        <li><strong>Jenkins:</strong> Automatización del proceso de testing, análisis, construcción y despliegue.</li>
+        <li><strong>SonarQube:</strong> Análisis de calidad del código y métricas de cobertura.</li>
+        <li><strong>Docker:</strong> Contenedorización y despliegue de la aplicación.</li>
     </ul>
 
     <h4 class="mt-4 text-secondary">Pipeline de Despliegue</h4>
     <p>El pipeline de Jenkins realiza los siguientes pasos:</p>
     <ol>
         <li>Descarga del código fuente desde el repositorio.</li>
-        <li>Ejecución de tests unitarios con Pytest.</li>
-        <li>Análisis de calidad con SonarQube.</li>
-        <li>Construcción y despliegue del contenedor Docker.</li>
-        <li>Verificación automática del despliegue en el servidor remoto.</li>
+        <li>Ejecución de tests unitarios con Pytest y generación del reporte de cobertura.</li>
+        <li>Análisis de calidad del código con SonarQube.</li>
+        <li>Validación del resultado del análisis mediante el Quality Gate.</li>
+        <li>Construcción de la imagen Docker de la aplicación.</li>
+        <li>Verificación de conexión a la base de datos <strong>MariaDB</strong> mediante una credencial segura almacenada en Jenkins.</li>
+        <li>Despliegue remoto automático en la máquina <strong>debianWordpress</strong>.</li>
+        <li>Verificación automática de que la aplicación está activa en el servidor remoto.</li>
     </ol>
 
     <h4 class="mt-4 text-secondary">Cómo Ejecutar Localmente</h4>
@@ -45,7 +50,10 @@ flask run</code></pre>
     <p class="mt-4">Para acceder a la aplicación en el navegador, entra en:
         <code>http://192.168.56.106:8081</code>
     </p>
+
+    <h4 class="mt-4 text-secondary">Configuración de la Base de Datos</h4>
+    <p>La aplicación se conecta a la base de datos externa <strong>MariaDB</strong> ubicada en la máquina <code>192.168.56.105</code>. 
+    El acceso se realiza con el usuario <code>flaskuser</code> y la contraseña protegida mediante una credencial de Jenkins 
+    denominada <code>mariadb-pass</code>. Esto garantiza una conexión segura y sin contraseñas visibles en el código fuente.</p>
 </div>
 {% endblock %}
-
-
