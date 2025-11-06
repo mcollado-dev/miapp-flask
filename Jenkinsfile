@@ -87,10 +87,15 @@ pipeline {
         stage('Check Database Connection') {
             steps {
                 withCredentials([string(credentialsId: 'mariadb-pass', variable: 'MARIADB_PASS')]) {
-                    sh '''
-                    echo "Verificando conexión con la base de datos MariaDB..."
-                    python3 - <<EOF
-import pymysql
+                    sh """
+                        echo 'Verificando conexión con la base de datos MariaDB...'
+
+                        # Activar entorno virtual
+                        . ${VENV_DIR}/bin/activate
+
+                        python3 - <<'EOF'
+import pymysql, sys
+
 try:
     conn = pymysql.connect(
         host="192.168.56.105",
@@ -100,12 +105,12 @@ try:
         connect_timeout=5
     )
     conn.close()
-    print("Conexión a MariaDB establecida correctamente.")
+    print("✅ Conexión a MariaDB establecida correctamente.")
 except Exception as e:
-    print("Error de conexión a MariaDB:", e)
-    exit(1)
+    print("❌ Error de conexión a MariaDB:", e)
+    sys.exit(1)
 EOF
-                    '''
+                    """
                 }
             }
         }
@@ -163,3 +168,4 @@ EOF
         }
     }
 }
+
