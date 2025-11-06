@@ -17,5 +17,9 @@ pytest-cov
 matplotlib
 
 
+pymysql
+
+
+
 
 
