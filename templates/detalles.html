@@ -4,7 +4,7 @@
 <div class="container mt-5">
     <h1 class="display-5 fw-bold text-primary mb-4 text-center">Detalles de la Aplicación</h1>
     <p class="lead text-center mb-5">
-        En esta sección encontrarás información general sobre los principales módulos y características de la aplicación.
+        Esta sección ofrece una vista general de los módulos principales, las herramientas utilizadas y la infraestructura técnica que conforma el proyecto.
     </p>
 
     <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -14,7 +14,8 @@
                 <div class="card-body text-center">
                     <h5 class="card-title text-primary fw-bold">Estadísticas</h5>
                     <p class="card-text">
-                        Permite visualizar métricas clave sobre los usuarios de la aplicación, incluyendo la distribución por roles mediante gráficos generados con <strong>Matplotlib</strong>.
+                        Permite visualizar métricas clave sobre los usuarios de la aplicación, incluyendo la distribución por roles. 
+                        Los gráficos se generan dinámicamente con <strong>Matplotlib</strong> y se integran directamente en las vistas HTML sin archivos temporales.
                     </p>
                     <a href="{{ url_for('estadisticas') }}" class="btn btn-outline-primary btn-sm">Ver estadísticas</a>
                 </div>
@@ -27,7 +28,9 @@
                 <div class="card-body text-center">
                     <h5 class="card-title text-success fw-bold">Funciones</h5>
                     <p class="card-text">
-                        Se describen las funcionalidades principales del sistema, como la gestión de usuarios, análisis de datos y despliegue automatizado con <strong>Docker</strong> y <strong>Jenkins</strong>.
+                        Describe las funcionalidades clave del sistema, como la gestión de usuarios en <strong>MariaDB</strong>, 
+                        la generación de estadísticas y el despliegue automatizado con <strong>Docker</strong> y <strong>Jenkins</strong>. 
+                        Incluye prácticas de seguridad basadas en credenciales protegidas.
                     </p>
                     <a href="{{ url_for('funciones') }}" class="btn btn-outline-success btn-sm">Ver funciones</a>
                 </div>
@@ -40,11 +43,30 @@
                 <div class="card-body text-center">
                     <h5 class="card-title text-warning fw-bold">Documentación</h5>
                     <p class="card-text">
-                        Consulta la estructura del proyecto, dependencias, y la descripción del pipeline CI/CD. Ideal para desarrolladores y mantenimiento técnico.
+                        Contiene la estructura del proyecto, dependencias, y descripción detallada del pipeline CI/CD. 
+                        Explica la integración de herramientas como <strong>SonarQube</strong> para análisis de código y 
+                        <strong>Jenkins</strong> para la entrega continua.
                     </p>
                     <a href="{{ url_for('documentacion') }}" class="btn btn-outline-warning btn-sm">Ver documentación</a>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Información de la infraestructura -->
+    <div class="mt-5">
+        <h4 class="text-secondary text-center mb-3">Infraestructura del Proyecto</h4>
+        <div class="card shadow-sm border-0 p-4">
+            <ul class="list-unstyled mb-0">
+                <li><strong>debianserver:</strong> Máquina principal con <strong>Jenkins</strong> para la integración y despliegue continuo.</li>
+                <li><strong>debianagent:</strong> Nodo Jenkins encargado de ejecutar los pipelines.</li>
+                <li><strong>sonarqube (192.168.56.104):</strong> Servidor de análisis de código y métricas de calidad.</li>
+                <li><strong>debianMariaDB (192.168.56.105):</strong> Servidor de base de datos <strong>MariaDB</strong> utilizado por la aplicación Flask.</li>
+                <li><strong>debianWordpress (192.168.56.106):</strong> Máquina donde se despliega la aplicación Flask en contenedor Docker.</li>
+            </ul>
+            <p class="mt-3 mb-0 text-muted">
+                Todos los componentes están integrados en una red privada (<code>192.168.56.x</code>) para garantizar seguridad y comunicación interna eficiente.
+            </p>
         </div>
     </div>
 
