@@ -8,14 +8,14 @@ pipeline {
 
     stages {
 
-        // === 1. DESCARGA DEL CÓDIGO DESDE EL REPOSITORIO ===
+        // 1. DESCARGA DEL CÓDIGO DESDE EL REPOSITORIO
         stage('Checkout SCM') {
             steps {
                 checkout scm
             }
         }
 
-        // === 2. EJECUCIÓN DE TESTS UNITARIOS Y GENERACIÓN DE COBERTURA ===
+        // 2. EJECUCIÓN DE TESTS UNITARIOS Y GENERACIÓN DE COBERTURA 
         stage('Run Unit Tests') {
             steps {
                 sh """
@@ -38,7 +38,7 @@ pipeline {
             }
         }
 
-        // === 3. ANÁLISIS DE CÓDIGO CON SONARQUBE ===
+        // 3. ANÁLISIS DE CÓDIGO CON SONARQUBE 
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube-Local') {
@@ -65,7 +65,7 @@ pipeline {
             }
         }
 
-        // === 4. VALIDACIÓN DE LA CALIDAD DEL CÓDIGO ===
+        // 4. VALIDACIÓN DE LA CALIDAD DEL CÓDIGO
         stage('Quality Gate') {
             steps {
                 timeout(time: 10, unit: 'MINUTES') {
@@ -75,7 +75,7 @@ pipeline {
             }
         }
 
-        // === 5. CONSTRUCCIÓN DE LA IMAGEN DOCKER ===
+        // 5. CONSTRUCCIÓN DE LA IMAGEN DOCKER
         stage('Build Docker Image') {
             steps {
                 // Se fuerza a no usar caché para evitar residuos
@@ -83,7 +83,7 @@ pipeline {
             }
         }
 
-        // === 6. DESPLIEGUE REMOTO EN LA VM ===
+        // 6. DESPLIEGUE REMOTO EN LA VM
         stage('Deploy Flask App en remoto') {
             steps {
                 sh """
@@ -101,7 +101,7 @@ pipeline {
             }
         }
 
-        // === 7. VERIFICAR QUE LA APP ESTÉ ARRIBA ===
+        // 7. VERIFICAR QUE LA APP ESTÉ ARRIBA
         stage('Verificar Despliegue') {
             steps {
                 sh """
@@ -126,7 +126,7 @@ pipeline {
         }
     }
 
-    // === RESULTADO FINAL DEL PIPELINE ===
+    //  8. RESULTADO FINAL DEL PIPELINE
     post {
         success {
             echo 'Pipeline completado correctamente.'
