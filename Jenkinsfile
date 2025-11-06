@@ -83,18 +83,19 @@ pipeline {
             }
         }
 
-        // NUEVA ETAPA: VERIFICAR CONEXIÓN A MARIADB
+        // 6. VERIFICACIÓN DE CONEXIÓN A MARIADB
         stage('Check Database Connection') {
             steps {
-                sh '''
-                echo "Verificando conexión con la base de datos MariaDB..."
-                python3 - <<'EOF'
+                withCredentials([string(credentialsId: 'mariadb-pass', variable: 'MARIADB_PASS')]) {
+                    sh '''
+                    echo "Verificando conexión con la base de datos MariaDB..."
+                    python3 - <<EOF
 import pymysql
 try:
     conn = pymysql.connect(
         host="192.168.56.105",
         user="flaskuser",
-        password="TU_CONTRASEÑA",
+        password="${MARIADB_PASS}",
         database="miappdb",
         connect_timeout=5
     )
@@ -104,11 +105,12 @@ except Exception as e:
     print("Error de conexión a MariaDB:", e)
     exit(1)
 EOF
-                '''
+                    '''
+                }
             }
         }
 
-        // 6. DESPLIEGUE REMOTO EN LA VM
+        // 7. DESPLIEGUE REMOTO EN LA VM
         stage('Deploy Flask App en remoto') {
             steps {
                 sh """
@@ -126,7 +128,7 @@ EOF
             }
         }
 
-        // 7. VERIFICAR QUE LA APP ESTÉ ARRIBA
+        // 8. VERIFICAR QUE LA APP ESTÉ ARRIBA
         stage('Verificar Despliegue') {
             steps {
                 sh """
@@ -151,7 +153,7 @@ EOF
         }
     }
 
-    //  8. RESULTADO FINAL DEL PIPELINE
+    // 9. RESULTADO FINAL DEL PIPELINE
     post {
         success {
             echo 'Pipeline completado correctamente.'
