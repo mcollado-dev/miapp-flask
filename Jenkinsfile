@@ -105,9 +105,9 @@ try:
         connect_timeout=5
     )
     conn.close()
-    print("✅ Conexión a MariaDB establecida correctamente.")
+    print("Conexión a MariaDB establecida correctamente :)")
 except Exception as e:
-    print("❌ Error de conexión a MariaDB:", e)
+    print("Error de conexión a MariaDB:", e)
     sys.exit(1)
 EOF
                     """
