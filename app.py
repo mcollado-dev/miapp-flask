@@ -18,7 +18,7 @@ app = Flask(__name__)
 # CONFIGURACIÓN DE LA BASE DE DATOS
 # ----------------------------
 # Usamos MariaDB como base de datos real
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://flaskuser:TU_CONTRASEÑA@192.168.56.105/miappdb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://flaskuser:PapayMama2016@192.168.56.105/miappdb'
 
 # Desactivamos el seguimiento de modificaciones para mejorar el rendimiento
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
