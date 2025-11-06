@@ -11,7 +11,7 @@ ENV PYTHONUNBUFFERED=1
 
 # -----------------------------------------------------------
 # Crea y establece el directorio de trabajo dentro del contenedor
-# /app será donde vivirá el código fuente de tu aplicación
+# /app será donde vivirá el código fuente de mi aplicación
 # -----------------------------------------------------------
 WORKDIR /app
 
