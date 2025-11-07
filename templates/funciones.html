@@ -4,41 +4,66 @@
 <div class="container mt-4">
     <h2 class="text-success mb-4">Funciones Disponibles</h2>
 
-    <p>Esta sección describe las principales funcionalidades implementadas en la aplicación <strong>Flask</strong>, así como su propósito dentro del flujo general del sistema y del pipeline de despliegue automatizado.</p>
+    <p>
+        Esta sección describe las principales funcionalidades implementadas en la aplicación <strong>Flask App Real</strong>,
+        así como su integración dentro del flujo completo de desarrollo, despliegue y automatización del sistema.
+        La aplicación combina tecnologías modernas como <strong>Flask</strong>, <strong>MariaDB</strong>, <strong>Docker</strong> y <strong>Jenkins</strong>
+        para demostrar un entorno DevOps totalmente funcional y profesional.
+    </p>
 
     <h4 class="mt-4 text-secondary">Gestión de Usuarios</h4>
-    <p>La aplicación implementa un modelo de datos <code>Usuario</code> gestionado mediante <strong>SQLAlchemy</strong> y almacenado en una base de datos <strong>MariaDB</strong> externa. 
-    Cada registro contiene un nombre, un correo electrónico y un rol asociado. 
-    Esta estructura permite una gestión de usuarios flexible y persistente en un entorno real, eliminando la dependencia de bases de datos locales de prueba.</p>
+    <p>
+        La aplicación implementa un modelo de datos <code>Usuario</code> gestionado mediante <strong>SQLAlchemy</strong> y almacenado en una base de datos real <strong>MariaDB</strong>.
+        Cada usuario tiene un nombre, correo electrónico y rol asignado, lo que permite una gestión estructurada y persistente de los datos.
+        Los usuarios pueden darse de alta manualmente desde la sección <a href="{{ url_for('registro') }}">Registrar usuario</a>,
+        y todos los registros se almacenan automáticamente en la base de datos, eliminando la generación de usuarios aleatorios desde el código.
+    </p>
+
+    <h4 class="mt-4 text-secondary">Inicio de Sesión (Login)</h4>
+    <p>
+        Se ha incorporado un sistema de <strong>autenticación básica</strong> que permite iniciar sesión con las credenciales almacenadas en la base de datos.
+        Desde la pestaña <a href="{{ url_for('login') }}">Login</a>, los usuarios pueden acceder introduciendo su nombre y correo electrónico.
+        El sistema valida los datos en <strong>MariaDB</strong> y muestra un mensaje de bienvenida personalizado con su rol.
+        Este módulo será ampliado para incluir contraseñas cifradas y gestión de sesiones seguras mediante <strong>Flask-Login</strong>.
+    </p>
 
     <h4 class="mt-4 text-secondary">Generación de Estadísticas</h4>
-    <p>La aplicación incorpora una sección de estadísticas que emplea <strong>Matplotlib</strong> para generar gráficos dinámicos en formato <em>base64</em>. 
-    Estos gráficos muestran la distribución de roles entre los usuarios y se renderizan directamente en la interfaz HTML sin necesidad de archivos físicos. 
-    El proceso está totalmente automatizado y optimizado para entornos web.</p>
+    <p>
+        La aplicación incluye una sección de estadísticas que utiliza <strong>Matplotlib</strong> para generar gráficos dinámicos de distribución de roles.
+        Las imágenes se convierten a formato <em>base64</em> para ser renderizadas directamente en la interfaz sin crear archivos físicos.
+        Este enfoque proporciona visualizaciones rápidas y ligeras sobre el número de usuarios por rol y su evolución en el sistema.
+    </p>
 
     <h4 class="mt-4 text-secondary">Exportación y Análisis de Datos</h4>
-    <p>El sistema está preparado para futuras extensiones que permitirán exportar información de usuarios y métricas en formatos como <strong>CSV</strong> o <strong>PDF</strong>. 
-    También admite el desarrollo de módulos analíticos más avanzados que procesen los datos directamente desde la base de datos <strong>MariaDB</strong> para obtener métricas de actividad o segmentaciones personalizadas.</p>
+    <p>
+        El sistema está preparado para futuras extensiones que permitirán exportar información de usuarios y métricas en formatos como <strong>CSV</strong> o <strong>PDF</strong>.
+        También admite la integración de módulos de análisis más avanzados para realizar segmentaciones, auditorías o estadísticas de uso directamente desde la base de datos <strong>MariaDB</strong>.
+    </p>
 
     <h4 class="mt-4 text-secondary">Configuración y Seguridad</h4>
-    <p>La aplicación utiliza variables de entorno y configuraciones específicas según el entorno (<code>development</code>, <code>testing</code> o <code>production</code>). 
-    La conexión con la base de datos se gestiona de forma segura a través de una credencial protegida en <strong>Jenkins</strong>, 
-    evitando almacenar contraseñas en el código fuente. 
-    Esto mejora la seguridad y permite una integración profesional con los pipelines de CI/CD.</p>
+    <p>
+        La aplicación soporta diferentes configuraciones de entorno (<code>development</code>, <code>testing</code>, <code>production</code>).
+        La conexión con la base de datos se puede gestionar mediante variables de entorno, evitando credenciales en el código fuente.
+        Durante el despliegue, <strong>Jenkins</strong> gestiona estas credenciales de forma segura, mejorando la protección del sistema y permitiendo un flujo de integración continua profesional.
+    </p>
 
     <h4 class="mt-4 text-secondary">Despliegue Automatizado</h4>
-    <p>El proceso de despliegue está completamente automatizado mediante <strong>Jenkins</strong> y <strong>Docker</strong>. 
-    El pipeline realiza las siguientes operaciones:</p>
+    <p>
+        El proceso de despliegue está completamente automatizado mediante <strong>Jenkins</strong> y <strong>Docker</strong>.
+        El pipeline ejecuta de forma secuencial las siguientes etapas:
+    </p>
     <ul>
-        <li>Descarga el código fuente y ejecuta los tests unitarios.</li>
-        <li>Analiza la calidad del código con <strong>SonarQube</strong>.</li>
-        <li>Construye la imagen Docker de la aplicación Flask.</li>
-        <li>Verifica la conexión con la base de datos <strong>MariaDB</strong> mediante una credencial segura.</li>
-        <li>Despliega la aplicación en el servidor remoto <code>192.168.56.106</code> y valida su disponibilidad.</li>
+        <li>Descarga del código fuente desde el repositorio GitHub.</li>
+        <li>Ejecución de tests unitarios y análisis estático del código con <strong>SonarQube</strong>.</li>
+        <li>Construcción de la imagen Docker de la aplicación Flask.</li>
+        <li>Verificación automática de conexión con <strong>MariaDB</strong> usando credenciales seguras.</li>
+        <li>Despliegue de la imagen en el servidor remoto <code>192.168.56.106</code> y validación del servicio en ejecución.</li>
     </ul>
 
-    <p>Gracias a esta integración, cada actualización del repositorio puede ser probada, analizada y desplegada automáticamente, 
-    garantizando un flujo de entrega continua y un entorno de producción controlado.</p>
+    <p>
+        Gracias a esta integración continua, cada actualización del código puede ser probada, analizada y desplegada sin intervención manual,
+        garantizando un ciclo de entrega ágil, seguro y reproducible.
+    </p>
 
     <div class="mt-5">
         <a href="{{ url_for('home') }}" class="btn btn-secondary">Volver al inicio</a>

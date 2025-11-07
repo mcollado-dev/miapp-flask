@@ -4,20 +4,53 @@
 <div class="container mt-5">
     <h1 class="display-5 fw-bold text-primary mb-4 text-center">Detalles de la Aplicación</h1>
     <p class="lead text-center mb-5">
-        Esta sección ofrece una vista general de los módulos principales, las herramientas utilizadas y la infraestructura técnica que conforma el proyecto.
+        Esta sección presenta una visión general de los módulos principales, las herramientas empleadas y la infraestructura
+        que da soporte al proyecto. El objetivo es mostrar la integración real entre desarrollo, automatización y despliegue.
     </p>
 
+    <!-- Bloque de tarjetas -->
     <div class="row row-cols-1 row-cols-md-3 g-4">
+        <!-- Tarjeta de Registro -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success fw-bold">Registro de Usuarios</h5>
+                    <p class="card-text">
+                        Permite dar de alta nuevos usuarios mediante un formulario accesible desde la aplicación.
+                        Los datos se almacenan directamente en <strong>MariaDB</strong> utilizando <strong>SQLAlchemy</strong>.
+                        Este módulo sustituye la creación automática de usuarios desde el código, aportando una gestión real y persistente.
+                    </p>
+                    <a href="{{ url_for('registro') }}" class="btn btn-outline-success btn-sm">Ir al registro</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta de Login -->
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-primary fw-bold">Login</h5>
+                    <p class="card-text">
+                        Permite a los usuarios autenticarse utilizando las credenciales registradas en la base de datos <strong>MariaDB</strong>.
+                        El sistema valida los datos introducidos y muestra un mensaje de bienvenida con el rol correspondiente.
+                        Está diseñado para ampliarse con contraseñas cifradas y sesiones seguras mediante <strong>Flask-Login</strong>.
+                    </p>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-sm">Iniciar sesión</a>
+                </div>
+            </div>
+        </div>
+
         <!-- Tarjeta de Estadísticas -->
         <div class="col">
             <div class="card h-100 shadow-sm border-0">
                 <div class="card-body text-center">
-                    <h5 class="card-title text-primary fw-bold">Estadísticas</h5>
+                    <h5 class="card-title text-info fw-bold">Estadísticas</h5>
                     <p class="card-text">
-                        Permite visualizar métricas clave sobre los usuarios de la aplicación, incluyendo la distribución por roles. 
-                        Los gráficos se generan dinámicamente con <strong>Matplotlib</strong> y se integran directamente en las vistas HTML sin archivos temporales.
+                        Permite visualizar métricas clave sobre los usuarios registrados, incluyendo la distribución de roles.
+                        Los gráficos se generan dinámicamente con <strong>Matplotlib</strong> y se integran directamente en la vista HTML
+                        en formato <em>base64</em>, sin crear archivos temporales.
                     </p>
-                    <a href="{{ url_for('estadisticas') }}" class="btn btn-outline-primary btn-sm">Ver estadísticas</a>
+                    <a href="{{ url_for('estadisticas') }}" class="btn btn-outline-info btn-sm">Ver estadísticas</a>
                 </div>
             </div>
         </div>
@@ -26,13 +59,13 @@
         <div class="col">
             <div class="card h-100 shadow-sm border-0">
                 <div class="card-body text-center">
-                    <h5 class="card-title text-success fw-bold">Funciones</h5>
+                    <h5 class="card-title text-secondary fw-bold">Funciones</h5>
                     <p class="card-text">
-                        Describe las funcionalidades clave del sistema, como la gestión de usuarios en <strong>MariaDB</strong>, 
-                        la generación de estadísticas y el despliegue automatizado con <strong>Docker</strong> y <strong>Jenkins</strong>. 
-                        Incluye prácticas de seguridad basadas en credenciales protegidas.
+                        Detalla las funcionalidades principales de la aplicación: gestión de usuarios reales en <strong>MariaDB</strong>,
+                        registro manual, autenticación básica, generación de estadísticas dinámicas y despliegue automatizado mediante
+                        <strong>Docker</strong> y <strong>Jenkins</strong>.
                     </p>
-                    <a href="{{ url_for('funciones') }}" class="btn btn-outline-success btn-sm">Ver funciones</a>
+                    <a href="{{ url_for('funciones') }}" class="btn btn-outline-secondary btn-sm">Ver funciones</a>
                 </div>
             </div>
         </div>
@@ -43,9 +76,9 @@
                 <div class="card-body text-center">
                     <h5 class="card-title text-warning fw-bold">Documentación</h5>
                     <p class="card-text">
-                        Contiene la estructura del proyecto, dependencias, y descripción detallada del pipeline CI/CD. 
-                        Explica la integración de herramientas como <strong>SonarQube</strong> para análisis de código y 
-                        <strong>Jenkins</strong> para la entrega continua.
+                        Explica la estructura del proyecto, las dependencias y el pipeline de integración continua completo.
+                        Incluye la configuración del <strong>Dockerfile</strong>, el <strong>Jenkinsfile</strong> y la integración con
+                        <strong>SonarQube</strong> para el análisis de calidad del código antes del despliegue.
                     </p>
                     <a href="{{ url_for('documentacion') }}" class="btn btn-outline-warning btn-sm">Ver documentación</a>
                 </div>
@@ -58,14 +91,15 @@
         <h4 class="text-secondary text-center mb-3">Infraestructura del Proyecto</h4>
         <div class="card shadow-sm border-0 p-4">
             <ul class="list-unstyled mb-0">
-                <li><strong>debianserver:</strong> Máquina principal con <strong>Jenkins</strong> para la integración y despliegue continuo.</li>
-                <li><strong>debianagent:</strong> Nodo Jenkins encargado de ejecutar los pipelines.</li>
-                <li><strong>sonarqube (192.168.56.104):</strong> Servidor de análisis de código y métricas de calidad.</li>
-                <li><strong>debianMariaDB (192.168.56.105):</strong> Servidor de base de datos <strong>MariaDB</strong> utilizado por la aplicación Flask.</li>
-                <li><strong>debianWordpress (192.168.56.106):</strong> Máquina donde se despliega la aplicación Flask en contenedor Docker.</li>
+                <li><strong>debianserver:</strong> Máquina principal que ejecuta <strong>Jenkins</strong> para la automatización del pipeline CI/CD.</li>
+                <li><strong>debianagent:</strong> Nodo agente de Jenkins encargado de construir la imagen Docker y ejecutar las pruebas.</li>
+                <li><strong>sonarqube (192.168.56.104):</strong> Servidor de análisis estático del código y métricas de calidad.</li>
+                <li><strong>debianMariaDB (192.168.56.105):</strong> Servidor de base de datos <strong>MariaDB</strong> utilizado por la aplicación Flask para almacenar usuarios.</li>
+                <li><strong>debianWordpress (192.168.56.106):</strong> Servidor remoto donde se despliega la aplicación Flask en contenedor Docker.</li>
             </ul>
             <p class="mt-3 mb-0 text-muted">
-                Todos los componentes están integrados en una red privada (<code>192.168.56.x</code>) para garantizar seguridad y comunicación interna eficiente.
+                Todos los componentes operan en una red privada (<code>192.168.56.x</code>), garantizando comunicación interna
+                segura, controlada y eficiente entre los distintos servicios del entorno DevOps.
             </p>
         </div>
     </div>
@@ -75,4 +109,3 @@
     </div>
 </div>
 {% endblock %}
-

@@ -2,15 +2,22 @@
 
 {% block content %}
 <div class="text-center mt-5">
-    <h1 class="display-5 fw-bold text-primary">¡Bienvenido a Mi App Flask!</h1>
+    <h1 class="display-5 fw-bold text-primary">Bienvenido a Flask App Real</h1>
     <p class="lead mt-3">
-        Esta es una aplicación de ejemplo con múltiples páginas y estadísticas.<br>
-        Desplegada automáticamente en Docker mediante Jenkins.
+        Aplicación web desarrollada con <strong>Flask</strong> e integrada en un entorno <strong>DevOps</strong> completo.<br>
+        Gestiona usuarios reales, genera estadísticas dinámicas y se despliega automáticamente en <strong>Docker</strong> mediante <strong>Jenkins</strong>.
     </p>
+
     <div class="mt-4">
+        <a href="/registro" class="btn btn-success me-2">Registrar usuario</a>
+        <a href="/login" class="btn btn-primary me-2">Iniciar sesión</a>
         <a href="/estadisticas" class="btn btn-info me-2">Ver estadísticas</a>
-        <a href="/funciones" class="btn btn-success me-2">Ver funciones</a>
+        <a href="/funciones" class="btn btn-secondary me-2">Ver funciones</a>
         <a href="/documentacion" class="btn btn-warning">Documentación</a>
+    </div>
+
+    <div class="mt-5 text-muted">
+        <p>Proyecto desplegado automáticamente en contenedor <strong>Docker</strong> mediante pipeline de <strong>Jenkins</strong>.</p>
     </div>
 </div>
 {% endblock %}

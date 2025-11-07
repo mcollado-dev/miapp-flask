@@ -1,14 +1,13 @@
 # Importamos Flask y la función render_template para renderizar las plantillas HTML
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 
 # Importamos la base de datos y el modelo Usuario desde el archivo models.py
 from models import db, Usuario
 
 # Librerías auxiliares
-import secrets                # Para generar valores aleatorios (usado al asignar roles)
 from collections import Counter  # Para contar elementos, en este caso roles de usuario
-import io                     # Para manejar datos binarios en memoria
-import base64                 # Para convertir imágenes a texto base64 (para incrustarlas en HTML)
+import io                        # Para manejar datos binarios en memoria
+import base64                    # Para convertir imágenes a texto base64 (para incrustarlas en HTML)
 import matplotlib.pyplot as plt  # Para generar gráficos de manera sencilla
 
 # Creamos la aplicación Flask
@@ -27,27 +26,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
 # ----------------------------
-# CREACIÓN DE LA BASE DE DATOS Y DATOS DE PRUEBA
+# CREACIÓN DE LA BASE DE DATOS (sin generar usuarios automáticos)
 # ----------------------------
 with app.app_context():
     db.create_all()  # Crea las tablas si no existen
-    if Usuario.query.count() == 0:  # Si la tabla está vacía, añadimos datos de ejemplo
-        nombres = [
-            "Admin", "Juan", "María", "Carlos", "Ana", "Luis", "Sofía", "Miguel",
-            "Lucía", "Pedro", "Carmen", "Jorge", "Elena", "Diego", "Laura",
-            "Alberto", "Isabel", "Fernando", "Paula", "Ricardo"
-        ]
-        roles = [
-            "Administrador", "Usuario", "Moderador", "Invitado",
-            "SuperUsuario", "Editor", "Colaborador", "Visitante"
-        ]
-        # Recorremos los nombres y generamos un email y rol aleatorio para cada usuario
-        for i, nombre in enumerate(nombres):
-            email = f"{nombre.lower()}{i}@example.com"
-            rol = secrets.choice(roles)
-            usuario = Usuario(nombre=nombre, email=email, rol=rol)
-            db.session.add(usuario)
-        db.session.commit()  # Guardamos todos los usuarios en la base de datos
 
 
 # ----------------------------
@@ -117,10 +99,52 @@ def detalles():
 
 
 # ----------------------------
+# NUEVA RUTA: Registro de usuarios manualmente
+# ----------------------------
+@app.route('/registro', methods=['GET', 'POST'])
+def registro():
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        email = request.form['email']
+        rol = request.form['rol']
+
+        # Crear nuevo usuario y guardarlo en la base de datos
+        nuevo_usuario = Usuario(nombre=nombre, email=email, rol=rol)
+        db.session.add(nuevo_usuario)
+        db.session.commit()
+
+        # Redirige a la página de estadísticas para ver el nuevo usuario
+        return redirect(url_for('estadisticas'))
+
+    # Si se accede por GET, renderiza el formulario de registro
+    return render_template('registro.html')
+
+
+# ----------------------------
+# NUEVA RUTA: Login de usuarios registrados
+# ----------------------------
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        nombre = request.form['nombre']
+
+        # Buscar usuario en la base de datos
+        usuario = Usuario.query.filter_by(email=email, nombre=nombre).first()
+
+        if usuario:
+            mensaje = f"Bienvenido, {usuario.nombre} ({usuario.rol})"
+            return render_template('login.html', mensaje=mensaje)
+        else:
+            error = "Usuario no encontrado. Revisa tus datos o regístrate primero."
+            return render_template('login.html', error=error)
+
+    return render_template('login.html')
+
+
+# ----------------------------
 # EJECUCIÓN DE LA APLICACIÓN
 # ----------------------------
 if __name__ == '__main__':
     # Ejecutamos la aplicación Flask en el puerto 80, accesible desde cualquier IP
     app.run(host='0.0.0.0', port=80)
-
-
