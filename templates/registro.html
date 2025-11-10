@@ -15,7 +15,7 @@
   {% endif %}
 
   <!-- Formulario de registro -->
-  <form method="POST" action="{{ url_for('registro') }}">
+  <form method="POST" action="/registro">
     {{ form.hidden_tag() }} {# Incluye CSRF token automáticamente #}
 
     <!-- Campo Nombre -->
