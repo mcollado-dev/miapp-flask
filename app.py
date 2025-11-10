@@ -10,15 +10,15 @@ import matplotlib.pyplot as plt
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tu_clave_secreta_super_segura'
 
-# Conexión a MariaDB real (como antes)
+# Conexión a MariaDB real
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://flaskuser:PapayMama2016@192.168.56.105/miappdb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-csrf = CSRFProtect(app)
+csrf = CSRFProtect(app)  # CSRF activado globalmente
 
 # ----------------------------
-# MODELO
+# MODELO DE USUARIO
 # ----------------------------
 class Usuario(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -114,14 +114,19 @@ def login():
     if form.validate_on_submit():
         usuario = Usuario.query.filter_by(email=form.email.data, nombre=form.nombre.data).first()
         if usuario:
-            mensaje = f"Bienvenido, {usuario.nombre}"
+            # Mostrar el rol en el mensaje de bienvenida
+            mensaje = f"Bienvenido, {usuario.nombre} ({usuario.rol})"
             return render_template('login.html', mensaje=mensaje, form=form)
         else:
             error = "Usuario no encontrado"
             return render_template('login.html', error=error, form=form)
     return render_template('login.html', form=form)
 
+# ----------------------------
+# EJECUCIÓN DE LA APP
+# ----------------------------
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(host='0.0.0.0', port=80)
+
