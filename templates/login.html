@@ -3,23 +3,30 @@
 <div class="container mt-4">
   <h2>Iniciar sesión</h2>
 
+  <!-- Mostrar mensajes de error -->
   {% if error %}
   <div class="alert alert-danger">{{ error }}</div>
   {% endif %}
 
+  <!-- Mostrar mensajes de éxito -->
   {% if mensaje %}
   <div class="alert alert-success">{{ mensaje }}</div>
   {% endif %}
 
+  <!-- Formulario de login con método POST -->
   <form method="POST" action="/login" class="mt-3">
+    
+    <!-- Token CSRF oculto -->
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
     <div class="mb-3">
       <label for="email" class="form-label">Correo electrónico:</label>
-      <input type="email" class="form-control" name="email" required>
+      <input type="email" class="form-control" id="email" name="email" required>
     </div>
 
     <div class="mb-3">
       <label for="nombre" class="form-label">Nombre:</label>
-      <input type="text" class="form-control" name="nombre" required>
+      <input type="text" class="form-control" id="nombre" name="nombre" required>
     </div>
 
     <button type="submit" class="btn btn-primary">Entrar</button>
