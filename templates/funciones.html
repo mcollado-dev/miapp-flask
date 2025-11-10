@@ -15,16 +15,15 @@
     <p>
         La aplicación implementa un modelo de datos <code>Usuario</code> gestionado mediante <strong>SQLAlchemy</strong> y almacenado en una base de datos real <strong>MariaDB</strong>.
         Cada usuario tiene un nombre, correo electrónico y rol asignado, lo que permite una gestión estructurada y persistente de los datos.
-        Los usuarios pueden darse de alta manualmente desde la sección <a href="{{ url_for('registro') }}">Registrar usuario</a>,
+        Los usuarios pueden darse de alta manualmente desde la sección <a href="{{ url_for('registro_get') }}">Registrar usuario</a>,
         y todos los registros se almacenan automáticamente en la base de datos, eliminando la generación de usuarios aleatorios desde el código.
     </p>
 
     <h4 class="mt-4 text-secondary">Inicio de Sesión (Login)</h4>
     <p>
         Se ha incorporado un sistema de <strong>autenticación básica</strong> que permite iniciar sesión con las credenciales almacenadas en la base de datos.
-        Desde la pestaña <a href="{{ url_for('login') }}">Login</a>, los usuarios pueden acceder introduciendo su nombre y correo electrónico.
+        Desde la pestaña <a href="{{ url_for('login_get') }}">Login</a>, los usuarios pueden acceder introduciendo su nombre y correo electrónico.
         El sistema valida los datos en <strong>MariaDB</strong> y muestra un mensaje de bienvenida personalizado con su rol.
-        Este módulo será ampliado para incluir contraseñas cifradas y gestión de sesiones seguras mediante <strong>Flask-Login</strong>.
     </p>
 
     <h4 class="mt-4 text-secondary">Generación de Estadísticas</h4>

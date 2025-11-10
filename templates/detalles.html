@@ -20,7 +20,7 @@
                         Los datos se almacenan directamente en <strong>MariaDB</strong> utilizando <strong>SQLAlchemy</strong>.
                         Este módulo sustituye la creación automática de usuarios desde el código, aportando una gestión real y persistente.
                     </p>
-                    <a href="{{ url_for('registro') }}" class="btn btn-outline-success btn-sm">Ir al registro</a>
+                    <a href="/registro" class="btn btn-outline-success btn-sm">Ir al registro</a>
                 </div>
             </div>
         </div>
@@ -35,7 +35,7 @@
                         El sistema valida los datos introducidos y muestra un mensaje de bienvenida con el rol correspondiente.
                         Está diseñado para ampliarse con contraseñas cifradas y sesiones seguras mediante <strong>Flask-Login</strong>.
                     </p>
-                    <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-sm">Iniciar sesión</a>
+                    <a href="/login" class="btn btn-outline-primary btn-sm">Iniciar sesión</a>
                 </div>
             </div>
         </div>
@@ -50,7 +50,7 @@
                         Los gráficos se generan dinámicamente con <strong>Matplotlib</strong> y se integran directamente en la vista HTML
                         en formato <em>base64</em>, sin crear archivos temporales.
                     </p>
-                    <a href="{{ url_for('estadisticas') }}" class="btn btn-outline-info btn-sm">Ver estadísticas</a>
+                    <a href="/estadisticas" class="btn btn-outline-info btn-sm">Ver estadísticas</a>
                 </div>
             </div>
         </div>
@@ -65,7 +65,7 @@
                         registro manual, autenticación básica, generación de estadísticas dinámicas y despliegue automatizado mediante
                         <strong>Docker</strong> y <strong>Jenkins</strong>.
                     </p>
-                    <a href="{{ url_for('funciones') }}" class="btn btn-outline-secondary btn-sm">Ver funciones</a>
+                    <a href="/funciones" class="btn btn-outline-secondary btn-sm">Ver funciones</a>
                 </div>
             </div>
         </div>
@@ -80,7 +80,7 @@
                         Incluye la configuración del <strong>Dockerfile</strong>, el <strong>Jenkinsfile</strong> y la integración con
                         <strong>SonarQube</strong> para el análisis de calidad del código antes del despliegue.
                     </p>
-                    <a href="{{ url_for('documentacion') }}" class="btn btn-outline-warning btn-sm">Ver documentación</a>
+                    <a href="/documentacion" class="btn btn-outline-warning btn-sm">Ver documentación</a>
                 </div>
             </div>
         </div>
