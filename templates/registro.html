@@ -8,37 +8,37 @@
   <div class="alert alert-danger">{{ error }}</div>
   {% endif %}
 
-  <!-- Formulario de registro con método POST -->
+  <!-- Formulario de registro con WTForms -->
   <form method="POST" action="/registro" class="mt-3">
-
-    <!-- Token CSRF oculto -->
-    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    {{ form.hidden_tag() }} {# Incluye automáticamente CSRF #}
 
     <div class="mb-3">
-      <label for="nombre" class="form-label">Nombre:</label>
-      <input type="text" class="form-control" id="nombre" name="nombre" required>
+      {{ form.nombre.label(class="form-label") }}
+      {{ form.nombre(class="form-control") }}
+      {% for error in form.nombre.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
     </div>
 
     <div class="mb-3">
-      <label for="email" class="form-label">Correo electrónico:</label>
-      <input type="email" class="form-control" id="email" name="email" required>
+      {{ form.email.label(class="form-label") }}
+      {{ form.email(class="form-control") }}
+      {% for error in form.email.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
     </div>
 
     <div class="mb-3">
-      <label for="rol" class="form-label">Rol:</label>
-      <select class="form-select" id="rol" name="rol" required>
-        <option value="Usuario">Usuario</option>
-        <option value="Administrador">Administrador</option>
-        <option value="Moderador">Moderador</option>
-        <option value="Invitado">Invitado</option>
-        <option value="Editor">Editor</option>
-        <option value="Colaborador">Colaborador</option>
-        <option value="Visitante">Visitante</option>
-      </select>
+      {{ form.rol.label(class="form-label") }}
+      {{ form.rol(class="form-select") }}
+      {% for error in form.rol.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
     </div>
 
     <button type="submit" class="btn btn-primary">Guardar usuario</button>
   </form>
 </div>
 {% endblock %}
+
 
