@@ -45,54 +45,41 @@ def home():
 # Ruta para mostrar estadísticas con gráfico
 @app.route('/estadisticas')
 def estadisticas():
-    # Obtenemos todos los usuarios de la base de datos
     usuarios = Usuario.query.all()
     total_usuarios = len(usuarios)
-
-    # Contamos cuántos usuarios hay por rol
     roles_count = Counter([u.rol for u in usuarios])
     roles_labels = list(roles_count.keys())
     roles_data = list(roles_count.values())
 
-    # Creamos un gráfico de barras horizontales con matplotlib
     plt.figure(figsize=(6, 4))
     plt.barh(roles_labels, roles_data, color='skyblue')
     plt.xlabel('Número de usuarios')
     plt.ylabel('Roles')
     plt.title('Distribución de roles')
 
-    # Guardamos el gráfico en memoria (sin crear archivo físico)
     img = io.BytesIO()
     plt.tight_layout()
     plt.savefig(img, format='png')
     img.seek(0)
-
-    # Convertimos el gráfico a base64 para poder mostrarlo directamente en el HTML
     grafico_base64 = base64.b64encode(img.getvalue()).decode()
     plt.close()
 
-    # Enviamos los datos y el gráfico al template HTML
-    return render_template(
-        'estadisticas.html',
-        total_usuarios=total_usuarios,
-        usuarios=usuarios,
-        grafico_base64=grafico_base64
-    )
+    return render_template('estadisticas.html',
+                           total_usuarios=total_usuarios,
+                           usuarios=usuarios,
+                           grafico_base64=grafico_base64)
 
 
-# Ruta para la página de funciones
 @app.route('/funciones')
 def funciones():
     return render_template('funciones.html')
 
 
-# Ruta para la página de documentación
 @app.route('/documentacion')
 def documentacion():
     return render_template('documentacion.html')
 
 
-# Nueva ruta para la página de detalles
 @app.route('/detalles')
 def detalles():
     return render_template('detalles.html')
@@ -104,19 +91,22 @@ def detalles():
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
     if request.method == 'POST':
-        nombre = request.form['nombre']
-        email = request.form['email']
-        rol = request.form['rol']
+        # Validación básica de seguridad para SonarQube
+        nombre = request.form.get('nombre', '').strip()
+        email = request.form.get('email', '').strip()
+        rol = request.form.get('rol', '').strip()
 
-        # Crear nuevo usuario y guardarlo en la base de datos
+        if not nombre or not email or not rol:
+            error = "Todos los campos son obligatorios."
+            return render_template('registro.html', error=error)
+
+        # Crear y guardar el nuevo usuario
         nuevo_usuario = Usuario(nombre=nombre, email=email, rol=rol)
         db.session.add(nuevo_usuario)
         db.session.commit()
 
-        # Redirige a la página de estadísticas para ver el nuevo usuario
         return redirect(url_for('estadisticas'))
 
-    # Si se accede por GET, renderiza el formulario de registro
     return render_template('registro.html')
 
 
@@ -126,8 +116,13 @@ def registro():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        nombre = request.form['nombre']
+        # Validación básica de seguridad para SonarQube
+        email = request.form.get('email', '').strip()
+        nombre = request.form.get('nombre', '').strip()
+
+        if not email or not nombre:
+            error = "Debes rellenar todos los campos."
+            return render_template('login.html', error=error)
 
         # Buscar usuario en la base de datos
         usuario = Usuario.query.filter_by(email=email, nombre=nombre).first()
@@ -146,5 +141,5 @@ def login():
 # EJECUCIÓN DE LA APLICACIÓN
 # ----------------------------
 if __name__ == '__main__':
-    # Ejecutamos la aplicación Flask en el puerto 80, accesible desde cualquier IP
     app.run(host='0.0.0.0', port=80)
+
