@@ -1,7 +1,3 @@
-# ----------------------------
-# app.py - Flask con CSRF, login y registro separados por GET y POST
-# ----------------------------
-
 from flask import Flask, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm, CSRFProtect
@@ -12,23 +8,21 @@ import io, base64
 import matplotlib.pyplot as plt
 
 # ----------------------------
-# CREACIÓN DE LA APP
+# Configuración de la app
 # ----------------------------
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tu_clave_secreta_super_segura'
 
-# Configuración de la base de datos
+# Conexión a MariaDB
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://flaskuser:PapayMama2016@192.168.56.105/miappdb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Inicializar SQLAlchemy
+# Inicialización
 db = SQLAlchemy(app)
-
-# Activar CSRF global
-csrf = CSRFProtect(app)
+csrf = CSRFProtect(app)  # CSRF activado globalmente
 
 # ----------------------------
-# MODELO DE USUARIO
+# Modelo de usuario
 # ----------------------------
 class Usuario(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -41,7 +35,7 @@ with app.app_context():
     db.create_all()
 
 # ----------------------------
-# FORMULARIOS
+# Formularios
 # ----------------------------
 class RegistroForm(FlaskForm):
     nombre = StringField('Nombre', validators=[DataRequired()])
@@ -61,28 +55,25 @@ class LoginForm(FlaskForm):
     email = EmailField('Correo electrónico', validators=[DataRequired(), Email()])
 
 # ----------------------------
-# RUTAS PÁGINAS PRINCIPALES
+# Rutas
 # ----------------------------
-@app.route('/')
+@app.route('/', endpoint='home')
 def home():
     return render_template('index.html')
 
-@app.route('/funciones')
+@app.route('/funciones', endpoint='funciones')
 def funciones():
     return render_template('funciones.html')
 
-@app.route('/documentacion')
+@app.route('/documentacion', endpoint='documentacion')
 def documentacion():
     return render_template('documentacion.html')
 
-@app.route('/detalles')
+@app.route('/detalles', endpoint='detalles')
 def detalles():
     return render_template('detalles.html')
 
-# ----------------------------
-# ESTADÍSTICAS
-# ----------------------------
-@app.route('/estadisticas')
+@app.route('/estadisticas', endpoint='estadisticas')
 def estadisticas():
     usuarios = Usuario.query.all()
     total_usuarios = len(usuarios)
@@ -90,14 +81,12 @@ def estadisticas():
     roles_labels = list(roles_count.keys())
     roles_data = list(roles_count.values())
 
-    # Crear gráfico de barras horizontal
+    # Generar gráfico
     plt.figure(figsize=(6,4))
     plt.barh(roles_labels, roles_data, color='skyblue')
     plt.xlabel('Número de usuarios')
     plt.ylabel('Roles')
     plt.title('Distribución de roles')
-
-    # Convertir gráfico a base64 para mostrar en HTML
     img = io.BytesIO()
     plt.tight_layout()
     plt.savefig(img, format='png')
@@ -110,18 +99,8 @@ def estadisticas():
                            usuarios=usuarios,
                            grafico_base64=grafico_base64)
 
-# ----------------------------
-# REGISTRO DE USUARIOS
-# ----------------------------
-@app.route('/registro', methods=['GET'])
-def registro_get():
-    """Mostrar formulario de registro"""
-    form = RegistroForm()
-    return render_template('registro.html', form=form)
-
-@app.route('/registro', methods=['POST'])
-def registro_post():
-    """Procesar formulario de registro"""
+@app.route('/registro', methods=['GET', 'POST'], endpoint='registro')
+def registro():
     form = RegistroForm()
     if form.validate_on_submit():
         nuevo_usuario = Usuario(
@@ -134,26 +113,13 @@ def registro_post():
         return redirect(url_for('estadisticas'))
     return render_template('registro.html', form=form)
 
-# ----------------------------
-# LOGIN DE USUARIOS
-# ----------------------------
-@app.route('/login', methods=['GET'])
-def login_get():
-    """Mostrar formulario de login"""
-    form = LoginForm()
-    return render_template('login.html', form=form)
-
-@app.route('/login', methods=['POST'])
-def login_post():
-    """Procesar formulario de login"""
+@app.route('/login', methods=['GET', 'POST'], endpoint='login')
+def login():
     form = LoginForm()
     if form.validate_on_submit():
-        usuario = Usuario.query.filter_by(
-            email=form.email.data,
-            nombre=form.nombre.data
-        ).first()
+        usuario = Usuario.query.filter_by(email=form.email.data, nombre=form.nombre.data).first()
         if usuario:
-            # Incluir rol en mensaje de bienvenida
+            # Mostrar rol en mensaje de bienvenida
             mensaje = f"Bienvenido, {usuario.nombre} ({usuario.rol})"
             return render_template('login.html', mensaje=mensaje, form=form)
         else:
@@ -162,11 +128,12 @@ def login_post():
     return render_template('login.html', form=form)
 
 # ----------------------------
-# EJECUCIÓN DE LA APP
+# Ejecutar app
 # ----------------------------
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(host='0.0.0.0', port=80)
+
 
 
