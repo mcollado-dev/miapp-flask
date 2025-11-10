@@ -5,16 +5,18 @@ import re
 # ----------------------------
 # Fixture: cliente de prueba usando la DB real
 # ----------------------------
-@pytest.fixture
+@pytest.fixture(scope='module')
 def client():
     """
     Prepara un cliente de prueba de Flask.
+    Desactiva CSRF solo para tests.
     Inserta un usuario de prueba para login y estadísticas.
     """
     app.config['TESTING'] = True
+    app.config['WTF_CSRF_ENABLED'] = False  # Desactivar CSRF en tests
 
     with app.app_context():
-        # Crear tablas si no existen
+        # Crear todas las tablas
         db.create_all()
 
         # Insertar usuario de prueba si no existe
@@ -22,10 +24,9 @@ def client():
             db.session.add(Usuario(nombre='TestUser', email='test@example.com', rol='Usuario'))
             db.session.commit()
 
-        # Proporcionar cliente Flask para tests
         yield app.test_client()
 
-        # Limpieza: borrar usuarios de prueba añadidos durante los tests
+        # Limpieza: eliminar usuarios de prueba
         Usuario.query.filter(Usuario.email.in_(['test@example.com', 'usuario_prueba@example.com'])).delete()
         db.session.commit()
 
@@ -79,7 +80,6 @@ def test_registro_get(client):
     assert "Registrar nuevo usuario" in html
 
 def test_registro_post_success(client):
-    """Registro POST válido funciona y redirige a estadísticas"""
     data = {
         'nombre': 'UsuarioPrueba',
         'email': 'usuario_prueba@example.com',
@@ -92,11 +92,11 @@ def test_registro_post_success(client):
     assert "UsuarioPrueba" in html
 
 def test_registro_post_missing_fields(client):
-    """Registro con campos vacíos produce error"""
     data = {'nombre': '', 'email': '', 'rol': ''}
     response = client.post('/registro', data=data)
     html = response.data.decode('utf-8')
-    assert "This field is required." in html or "Todos los campos son obligatorios." in html
+    # WTForms validará campos obligatorios
+    assert "This field is required" in html or "Todos los campos son obligatorios." in html
 
 # ----------------------------
 # Tests de login
@@ -123,9 +123,4 @@ def test_login_post_missing_fields(client):
     data = {'nombre': '', 'email': ''}
     response = client.post('/login', data=data)
     html = response.data.decode('utf-8')
-    assert "This field is required." in html or "Debes rellenar todos los campos." in html
-
-
-
-
-
+    assert "This field is required" in html or "Debes rellenar todos los campos." in html
