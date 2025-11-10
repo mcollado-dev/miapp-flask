@@ -1,5 +1,6 @@
 import pytest
 from app import app, db, Usuario
+from flask import session
 import re
 
 # ----------------------------
@@ -9,14 +10,12 @@ import re
 def client():
     """
     Prepara un cliente de prueba de Flask.
-    Desactiva CSRF solo para tests.
     Inserta un usuario de prueba para login y estadísticas.
     """
     app.config['TESTING'] = True
-    app.config['WTF_CSRF_ENABLED'] = False  # Desactivar CSRF en tests
 
     with app.app_context():
-        # Crear todas las tablas
+        # Crear todas las tablas si no existen
         db.create_all()
 
         # Insertar usuario de prueba si no existe
@@ -29,6 +28,7 @@ def client():
         # Limpieza: eliminar usuarios de prueba
         Usuario.query.filter(Usuario.email.in_(['test@example.com', 'usuario_prueba@example.com'])).delete()
         db.session.commit()
+
 
 # ----------------------------
 # Tests de páginas GET
@@ -80,10 +80,17 @@ def test_registro_get(client):
     assert "Registrar nuevo usuario" in html
 
 def test_registro_post_success(client):
+    # Hacer GET primero para obtener CSRF token
+    response = client.get('/registro')
+    html = response.data.decode('utf-8')
+    match = re.search(r'name="csrf_token" type="hidden" value="([^"]+)"', html)
+    csrf_token = match.group(1)
+
     data = {
         'nombre': 'UsuarioPrueba',
         'email': 'usuario_prueba@example.com',
-        'rol': 'Usuario'
+        'rol': 'Usuario',
+        'csrf_token': csrf_token
     }
     response = client.post('/registro', data=data, follow_redirects=True)
     html = response.data.decode('utf-8')
@@ -92,7 +99,12 @@ def test_registro_post_success(client):
     assert "UsuarioPrueba" in html
 
 def test_registro_post_missing_fields(client):
-    data = {'nombre': '', 'email': '', 'rol': ''}
+    response = client.get('/registro')
+    html = response.data.decode('utf-8')
+    match = re.search(r'name="csrf_token" type="hidden" value="([^"]+)"', html)
+    csrf_token = match.group(1)
+
+    data = {'nombre': '', 'email': '', 'rol': '', 'csrf_token': csrf_token}
     response = client.post('/registro', data=data)
     html = response.data.decode('utf-8')
     # WTForms validará campos obligatorios
@@ -108,19 +120,34 @@ def test_login_get(client):
     assert "Iniciar sesión" in html
 
 def test_login_post_success(client):
-    data = {'nombre': 'TestUser', 'email': 'test@example.com'}
+    response = client.get('/login')
+    html = response.data.decode('utf-8')
+    match = re.search(r'name="csrf_token" type="hidden" value="([^"]+)"', html)
+    csrf_token = match.group(1)
+
+    data = {'nombre': 'TestUser', 'email': 'test@example.com', 'csrf_token': csrf_token}
     response = client.post('/login', data=data)
     html = response.data.decode('utf-8')
     assert "Bienvenido, TestUser" in html
 
 def test_login_post_user_not_found(client):
-    data = {'nombre': 'NoExiste', 'email': 'noexiste@example.com'}
+    response = client.get('/login')
+    html = response.data.decode('utf-8')
+    match = re.search(r'name="csrf_token" type="hidden" value="([^"]+)"', html)
+    csrf_token = match.group(1)
+
+    data = {'nombre': 'NoExiste', 'email': 'noexiste@example.com', 'csrf_token': csrf_token}
     response = client.post('/login', data=data)
     html = response.data.decode('utf-8')
     assert "Usuario no encontrado" in html
 
 def test_login_post_missing_fields(client):
-    data = {'nombre': '', 'email': ''}
+    response = client.get('/login')
+    html = response.data.decode('utf-8')
+    match = re.search(r'name="csrf_token" type="hidden" value="([^"]+)"', html)
+    csrf_token = match.group(1)
+
+    data = {'nombre': '', 'email': '', 'csrf_token': csrf_token}
     response = client.post('/login', data=data)
     html = response.data.decode('utf-8')
     assert "This field is required" in html or "Debes rellenar todos los campos." in html
