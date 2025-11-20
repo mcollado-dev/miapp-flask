@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm, CSRFProtect
 from wtforms import StringField, SelectField, EmailField
@@ -12,14 +12,11 @@ import matplotlib.pyplot as plt
 # ----------------------------
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'tu_clave_secreta_super_segura'
-
-# Conexión a MariaDB
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://flaskuser:PapayMama2016@192.168.56.105/miappdb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Inicialización de DB y CSRF
 db = SQLAlchemy(app)
-csrf = CSRFProtect(app)  # CSRF activado globalmente
+csrf = CSRFProtect(app)
 
 # ----------------------------
 # Modelo de usuario
@@ -30,7 +27,6 @@ class Usuario(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     rol = db.Column(db.String(50), nullable=False)
 
-# Crear tablas si no existen
 with app.app_context():
     db.create_all()
 
@@ -43,11 +39,7 @@ class RegistroForm(FlaskForm):
     rol = SelectField('Rol', choices=[
         ('Usuario', 'Usuario'),
         ('Administrador', 'Administrador'),
-        ('Moderador', 'Moderador'),
-        ('Invitado', 'Invitado'),
-        ('Editor', 'Editor'),
-        ('Colaborador', 'Colaborador'),
-        ('Visitante', 'Visitante')
+        ('Colaborador', 'Colaborador')
     ], validators=[DataRequired()])
 
 class LoginForm(FlaskForm):
@@ -75,6 +67,16 @@ def detalles():
 
 @app.route('/estadisticas', endpoint='estadisticas')
 def estadisticas():
+    # SOLO Administrador y Colaborador pueden acceder
+    if session.get("rol") == "Usuario" or session.get("rol") is None:
+        error = "No tienes permisos para acceder a esta sección"
+        return render_template("estadisticas.html",
+                               error=error,
+                               usuarios=[],
+                               total_usuarios=0,
+                               grafico_base64=None,
+                               mostrar_volver=True)
+
     usuarios = Usuario.query.all()
     total_usuarios = len(usuarios)
     roles_count = Counter([u.rol for u in usuarios])
@@ -97,17 +99,32 @@ def estadisticas():
     return render_template('estadisticas.html',
                            total_usuarios=total_usuarios,
                            usuarios=usuarios,
-                           grafico_base64=grafico_base64)
+                           grafico_base64=grafico_base64,
+                           error=None,
+                           mostrar_volver=False)
 
-# Mostrar formulario de registro (GET)
+# ----------------------------
+# Registro de usuarios (PROTEGIDO)
+# ----------------------------
 @app.route('/registro', methods=['GET'], endpoint='registro_get')
 def registro_get():
-    form = RegistroForm()
-    return render_template('registro.html', form=form)
+    form = None
+    error = None
+    mostrar_volver = False
+    if session.get("rol") == "Administrador":
+        form = RegistroForm()
+    else:
+        error = "No tienes permisos para acceder a esta sección"
+        mostrar_volver = True
+    return render_template('registro.html', form=form, error=error, mostrar_volver=mostrar_volver)
 
-# Procesar envío de registro (POST)
 @app.route('/registro', methods=['POST'], endpoint='registro_post')
 def registro_post():
+    if session.get("rol") != "Administrador":
+        error = "No tienes permisos para registrar usuarios"
+        mostrar_volver = True
+        return render_template("registro.html", form=None, error=error, mostrar_volver=mostrar_volver)
+
     form = RegistroForm()
     if form.validate_on_submit():
         nuevo_usuario = Usuario(
@@ -118,27 +135,32 @@ def registro_post():
         db.session.add(nuevo_usuario)
         db.session.commit()
         return redirect(url_for('estadisticas'))
-    return render_template('registro.html', form=form)
 
-# Mostrar formulario de login (GET)
+    return render_template('registro.html', form=form, error=None, mostrar_volver=False)
+
+# ----------------------------
+# Login
+# ----------------------------
 @app.route('/login', methods=['GET'], endpoint='login_get')
 def login_get():
     form = LoginForm()
     return render_template('login.html', form=form)
 
-# Procesar login (POST)
 @app.route('/login', methods=['POST'], endpoint='login_post')
 def login_post():
     form = LoginForm()
+
     if form.validate_on_submit():
         usuario = Usuario.query.filter_by(email=form.email.data, nombre=form.nombre.data).first()
         if usuario:
-            # Mostrar rol en mensaje de bienvenida
+            session['usuario'] = usuario.nombre
+            session['rol'] = usuario.rol
             mensaje = f"Bienvenido, {usuario.nombre} ({usuario.rol})"
             return render_template('login.html', mensaje=mensaje, form=form)
         else:
             error = "Usuario no encontrado"
             return render_template('login.html', error=error, form=form)
+
     return render_template('login.html', form=form)
 
 # ----------------------------
@@ -148,6 +170,9 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(host='0.0.0.0', port=80)
+
+
+
 
 
 

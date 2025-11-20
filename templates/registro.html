@@ -2,50 +2,54 @@
 
 {% block content %}
 <div class="container mt-4">
-  <h2>Registrar nuevo usuario</h2>
 
-  <!-- Mensajes de error general -->
-  {% if error %}
-    <div class="alert alert-danger">{{ error }}</div>
+  {% if session.get("rol") != "Administrador" %}
+      <div class="alert alert-danger">
+          No tienes permisos para acceder a esta sección.
+      </div>
+      <a href="/" class="btn btn-secondary">Volver al inicio</a>
+  {% else %}
+      <h2>Registrar nuevo usuario</h2>
+
+      {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+      {% endif %}
+
+      {% if mensaje %}
+        <div class="alert alert-success">{{ mensaje }}</div>
+      {% endif %}
+
+      <form method="POST" action="/registro">
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          {{ form.nombre.label(class="form-label") }}
+          {{ form.nombre(class="form-control", placeholder="Ingresa tu nombre") }}
+          {% for e in form.nombre.errors %}
+            <div class="text-danger">{{ e }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-3">
+          {{ form.email.label(class="form-label") }}
+          {{ form.email(class="form-control", placeholder="correo@ejemplo.com") }}
+          {% for e in form.email.errors %}
+            <div class="text-danger">{{ e }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-3">
+          {{ form.rol.label(class="form-label") }}
+          {{ form.rol(class="form-select") }}
+          {% for e in form.rol.errors %}
+            <div class="text-danger">{{ e }}</div>
+          {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Registrar usuario</button>
+      </form>
   {% endif %}
 
-  <!-- Mensajes de éxito -->
-  {% if mensaje %}
-    <div class="alert alert-success">{{ mensaje }}</div>
-  {% endif %}
-
-  <!-- Formulario de registro -->
-  <form method="POST" action="/registro">
-    {{ form.hidden_tag() }} {# Incluye CSRF token automáticamente #}
-
-    <!-- Campo Nombre -->
-    <div class="mb-3">
-      {{ form.nombre.label(class="form-label") }}
-      {{ form.nombre(class="form-control", placeholder="Ingresa tu nombre") }}
-      {% for e in form.nombre.errors %}
-        <div class="text-danger">{{ e }}</div>
-      {% endfor %}
-    </div>
-
-    <!-- Campo Email -->
-    <div class="mb-3">
-      {{ form.email.label(class="form-label") }}
-      {{ form.email(class="form-control", placeholder="correo@ejemplo.com") }}
-      {% for e in form.email.errors %}
-        <div class="text-danger">{{ e }}</div>
-      {% endfor %}
-    </div>
-
-    <!-- Campo Rol -->
-    <div class="mb-3">
-      {{ form.rol.label(class="form-label") }}
-      {{ form.rol(class="form-select") }}
-      {% for e in form.rol.errors %}
-        <div class="text-danger">{{ e }}</div>
-      {% endfor %}
-    </div>
-
-    <button type="submit" class="btn btn-primary">Registrar usuario</button>
-  </form>
 </div>
 {% endblock %}
+
