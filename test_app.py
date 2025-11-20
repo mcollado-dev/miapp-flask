@@ -38,6 +38,10 @@ def test_home_page(client):
     assert "Inicio" in resp.data.decode('utf-8') or "Bienvenido" in resp.data.decode('utf-8')
 
 def test_registro_get(client):
+    # Simular sesión de Administrador para que el formulario aparezca
+    with client.session_transaction() as sess:
+        sess['rol'] = 'Administrador'
+
     resp = client.get('/registro')
     assert resp.status_code == 200
     html = resp.data.decode('utf-8')
@@ -53,6 +57,10 @@ def test_login_get(client):
 # Tests POST registro
 # ----------------------------
 def test_registro_post_success(client):
+    # Simular sesión de Administrador
+    with client.session_transaction() as sess:
+        sess['rol'] = 'Administrador'
+
     resp = client.get('/registro')
     csrf = get_csrf(resp.data.decode())
     data = {
@@ -68,6 +76,10 @@ def test_registro_post_success(client):
     assert "UsuarioPrueba" in html
 
 def test_registro_post_missing_fields(client):
+    # Simular sesión de Administrador
+    with client.session_transaction() as sess:
+        sess['rol'] = 'Administrador'
+
     resp = client.get('/registro')
     csrf = get_csrf(resp.data.decode())
     data = {'nombre': '', 'email': '', 'rol': '', 'csrf_token': csrf}
@@ -118,9 +130,12 @@ def test_detalles_page(client):
     assert resp.status_code == 200
 
 def test_estadisticas_page(client):
+    # Simular sesión de Administrador para que se muestre la tabla
+    with client.session_transaction() as sess:
+        sess['rol'] = 'Administrador'
+
     resp = client.get('/estadisticas')
     html = resp.data.decode('utf-8')
     assert resp.status_code == 200
     assert "Total de usuarios" in html
     assert "TestUser" in html
-
