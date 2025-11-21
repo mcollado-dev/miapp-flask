@@ -2,11 +2,12 @@ import pytest
 from app import app, db, Usuario
 import re
 from werkzeug.security import generate_password_hash
+import secrets  # Para generar contraseñas dinámicas y evitar hard-coded
 
 # ----------------------------
 # Contraseña de prueba
 # ----------------------------
-TEST_PASSWORD = 'Prueba1234'  # solo para tests, evita hard-coded literals directos
+TEST_PASSWORD = 'Prueba1234'  # solo para tests de usuarios válidos
 
 # ----------------------------
 # Fixture: cliente de prueba
@@ -123,10 +124,14 @@ def test_login_post_success(client):
 def test_login_post_user_not_found(client):
     resp = client.get('/login')
     csrf = get_csrf(resp.data.decode())
+
+    # Generar contraseña aleatoria para no hard-codear
+    random_password = secrets.token_urlsafe(12)
+
     data = {
         'nombre': 'NoExiste',
         'email': 'noexiste@example.com',
-        'password': 'Cualquier123',
+        'password': random_password,
         'csrf_token': csrf
     }
     resp = client.post('/login', data=data)
@@ -170,4 +175,5 @@ def test_estadisticas_page(client):
     assert resp.status_code == 200
     assert "Total de usuarios" in html
     assert "TestUser" in html
+
 
