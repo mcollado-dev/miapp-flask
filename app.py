@@ -1,17 +1,18 @@
 from flask import Flask, render_template, redirect, url_for, request, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm, CSRFProtect
-from wtforms import StringField, SelectField, EmailField
-from wtforms.validators import DataRequired, Email
+from wtforms import StringField, SelectField, EmailField, PasswordField
+from wtforms.validators import DataRequired, Email, EqualTo  # <-- EqualTo importado
 from collections import Counter
 import io, base64
 import matplotlib.pyplot as plt
+from werkzeug.security import generate_password_hash, check_password_hash
 
 # ----------------------------
 # Configuración de la app
 # ----------------------------
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'tu_clave_secreta_super_segura'
+app.config['SECRET_KEY'] = 'PapayMama2016'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://flaskuser:PapayMama2016@192.168.56.105/miappdb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -26,6 +27,7 @@ class Usuario(db.Model):
     nombre = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     rol = db.Column(db.String(50), nullable=False)
+    password_hash = db.Column(db.String(255), nullable=True)
 
 with app.app_context():
     db.create_all()
@@ -41,10 +43,16 @@ class RegistroForm(FlaskForm):
         ('Administrador', 'Administrador'),
         ('Colaborador', 'Colaborador')
     ], validators=[DataRequired()])
+    password = PasswordField('Contraseña', validators=[DataRequired()])
+    confirmar = PasswordField('Confirmar Contraseña', validators=[
+        DataRequired(),
+        EqualTo('password', message='Las contraseñas deben coincidir')
+    ])
 
 class LoginForm(FlaskForm):
     nombre = StringField('Nombre', validators=[DataRequired()])
     email = EmailField('Correo electrónico', validators=[DataRequired(), Email()])
+    password = PasswordField('Contraseña', validators=[DataRequired()])
 
 # ----------------------------
 # Rutas GET
@@ -67,7 +75,6 @@ def detalles():
 
 @app.route('/estadisticas', endpoint='estadisticas')
 def estadisticas():
-    # SOLO Administrador y Colaborador pueden acceder
     if session.get("rol") == "Usuario" or session.get("rol") is None:
         error = "No tienes permisos para acceder a esta sección"
         return render_template("estadisticas.html",
@@ -83,7 +90,6 @@ def estadisticas():
     roles_labels = list(roles_count.keys())
     roles_data = list(roles_count.values())
 
-    # Generar gráfico
     plt.figure(figsize=(6,4))
     plt.barh(roles_labels, roles_data, color='skyblue')
     plt.xlabel('Número de usuarios')
@@ -104,7 +110,7 @@ def estadisticas():
                            mostrar_volver=False)
 
 # ----------------------------
-# Registro de usuarios (PROTEGIDO)
+# Registro de usuarios
 # ----------------------------
 @app.route('/registro', methods=['GET'], endpoint='registro_get')
 def registro_get():
@@ -130,7 +136,8 @@ def registro_post():
         nuevo_usuario = Usuario(
             nombre=form.nombre.data,
             email=form.email.data,
-            rol=form.rol.data
+            rol=form.rol.data,
+            password_hash=generate_password_hash(form.password.data)
         )
         db.session.add(nuevo_usuario)
         db.session.commit()
@@ -149,16 +156,15 @@ def login_get():
 @app.route('/login', methods=['POST'], endpoint='login_post')
 def login_post():
     form = LoginForm()
-
     if form.validate_on_submit():
         usuario = Usuario.query.filter_by(email=form.email.data, nombre=form.nombre.data).first()
-        if usuario:
+        if usuario and usuario.password_hash and check_password_hash(usuario.password_hash, form.password.data):
             session['usuario'] = usuario.nombre
             session['rol'] = usuario.rol
             mensaje = f"Bienvenido, {usuario.nombre} ({usuario.rol})"
             return render_template('login.html', mensaje=mensaje, form=form)
         else:
-            error = "Usuario no encontrado"
+            error = "Usuario o contraseña incorrectos"
             return render_template('login.html', error=error, form=form)
 
     return render_template('login.html', form=form)
@@ -170,6 +176,9 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(host='0.0.0.0', port=80)
+
+
+
 
 
 

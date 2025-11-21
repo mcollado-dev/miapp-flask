@@ -18,9 +18,13 @@ class Usuario(db.Model):
     # Campo 'rol': texto obligatorio con valor por defecto 'Lector'
     rol = db.Column(db.String(50), nullable=False, default='Lector')
 
+    # Campo 'password_hash': contraseña hasheada (nunca se guarda en texto plano)
+    password_hash = db.Column(db.String(255), nullable=True)
+
     # Representación legible del objeto, útil para depuración o consola
     def __repr__(self):
         return f'<Usuario {self.nombre}>'
+
 
 
 

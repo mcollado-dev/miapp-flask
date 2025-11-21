@@ -46,10 +46,29 @@
           {% endfor %}
         </div>
 
+        <!-- AÑADIR CONTRASEÑA -->
+        <div class="mb-3">
+          {{ form.password.label(class="form-label") }}
+          {{ form.password(class="form-control", placeholder="Contraseña segura") }}
+          {% for e in form.password.errors %}
+            <div class="text-danger">{{ e }}</div>
+          {% endfor %}
+        </div>
+
+        <!-- CONFIRMAR CONTRASEÑA -->
+        <div class="mb-3">
+          {{ form.confirmar.label(class="form-label") }}
+          {{ form.confirmar(class="form-control", placeholder="Repite la contraseña") }}
+          {% for e in form.confirmar.errors %}
+            <div class="text-danger">{{ e }}</div>
+          {% endfor %}
+        </div>
+
         <button type="submit" class="btn btn-primary">Registrar usuario</button>
       </form>
   {% endif %}
 
 </div>
 {% endblock %}
+
 

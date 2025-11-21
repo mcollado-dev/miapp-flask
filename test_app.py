@@ -1,6 +1,7 @@
 import pytest
 from app import app, db, Usuario
 import re
+from werkzeug.security import generate_password_hash
 
 # ----------------------------
 # Fixture: cliente de prueba
@@ -11,9 +12,14 @@ def client():
 
     with app.app_context():
         db.create_all()
-        # Usuario de prueba
+        # Usuario de prueba con contraseña
         if not Usuario.query.filter_by(email='test@example.com').first():
-            db.session.add(Usuario(nombre='TestUser', email='test@example.com', rol='Usuario'))
+            db.session.add(Usuario(
+                nombre='TestUser',
+                email='test@example.com',
+                rol='Usuario',
+                password_hash=generate_password_hash('Prueba1234')
+            ))
             db.session.commit()
 
         yield app.test_client()
@@ -38,7 +44,6 @@ def test_home_page(client):
     assert "Inicio" in resp.data.decode('utf-8') or "Bienvenido" in resp.data.decode('utf-8')
 
 def test_registro_get(client):
-    # Simular sesión de Administrador para que el formulario aparezca
     with client.session_transaction() as sess:
         sess['rol'] = 'Administrador'
 
@@ -57,7 +62,6 @@ def test_login_get(client):
 # Tests POST registro
 # ----------------------------
 def test_registro_post_success(client):
-    # Simular sesión de Administrador
     with client.session_transaction() as sess:
         sess['rol'] = 'Administrador'
 
@@ -67,6 +71,8 @@ def test_registro_post_success(client):
         'nombre': 'UsuarioPrueba',
         'email': 'usuario_prueba@example.com',
         'rol': 'Usuario',
+        'password': 'Prueba1234',
+        'confirmar': 'Prueba1234',
         'csrf_token': csrf
     }
     resp = client.post('/registro', data=data, follow_redirects=True)
@@ -76,13 +82,19 @@ def test_registro_post_success(client):
     assert "UsuarioPrueba" in html
 
 def test_registro_post_missing_fields(client):
-    # Simular sesión de Administrador
     with client.session_transaction() as sess:
         sess['rol'] = 'Administrador'
 
     resp = client.get('/registro')
     csrf = get_csrf(resp.data.decode())
-    data = {'nombre': '', 'email': '', 'rol': '', 'csrf_token': csrf}
+    data = {
+        'nombre': '',
+        'email': '',
+        'rol': '',
+        'password': '',
+        'confirmar': '',
+        'csrf_token': csrf
+    }
     resp = client.post('/registro', data=data)
     html = resp.data.decode('utf-8')
     assert "This field is required" in html or "Todos los campos son obligatorios." in html
@@ -93,7 +105,12 @@ def test_registro_post_missing_fields(client):
 def test_login_post_success(client):
     resp = client.get('/login')
     csrf = get_csrf(resp.data.decode())
-    data = {'nombre': 'TestUser', 'email': 'test@example.com', 'csrf_token': csrf}
+    data = {
+        'nombre': 'TestUser',
+        'email': 'test@example.com',
+        'password': 'Prueba1234',
+        'csrf_token': csrf
+    }
     resp = client.post('/login', data=data)
     html = resp.data.decode('utf-8')
     assert "Bienvenido, TestUser (Usuario)" in html
@@ -101,15 +118,25 @@ def test_login_post_success(client):
 def test_login_post_user_not_found(client):
     resp = client.get('/login')
     csrf = get_csrf(resp.data.decode())
-    data = {'nombre': 'NoExiste', 'email': 'noexiste@example.com', 'csrf_token': csrf}
+    data = {
+        'nombre': 'NoExiste',
+        'email': 'noexiste@example.com',
+        'password': 'Cualquier123',
+        'csrf_token': csrf
+    }
     resp = client.post('/login', data=data)
     html = resp.data.decode('utf-8')
-    assert "Usuario no encontrado" in html
+    assert "Usuario o contraseña incorrectos" in html
 
 def test_login_post_missing_fields(client):
     resp = client.get('/login')
     csrf = get_csrf(resp.data.decode())
-    data = {'nombre': '', 'email': '', 'csrf_token': csrf}
+    data = {
+        'nombre': '',
+        'email': '',
+        'password': '',
+        'csrf_token': csrf
+    }
     resp = client.post('/login', data=data)
     html = resp.data.decode('utf-8')
     assert "This field is required" in html or "Debes rellenar todos los campos." in html
@@ -130,7 +157,6 @@ def test_detalles_page(client):
     assert resp.status_code == 200
 
 def test_estadisticas_page(client):
-    # Simular sesión de Administrador para que se muestre la tabla
     with client.session_transaction() as sess:
         sess['rol'] = 'Administrador'
 
