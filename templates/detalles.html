@@ -4,8 +4,8 @@
 <div class="container mt-5">
     <h1 class="display-5 fw-bold text-primary mb-4 text-center">Detalles de la Aplicación</h1>
     <p class="lead text-center mb-5">
-        Esta sección presenta una visión general de los módulos principales, las herramientas empleadas y la infraestructura
-        que da soporte al proyecto. El objetivo es mostrar la integración real entre desarrollo, automatización y despliegue.
+        Esta sección presenta una visión general de los módulos principales, herramientas empleadas y la infraestructura
+        que da soporte al proyecto, incluyendo las nuevas mejoras en autenticación y tests automatizados.
     </p>
 
     <!-- Bloque de tarjetas -->
@@ -16,9 +16,10 @@
                 <div class="card-body text-center">
                     <h5 class="card-title text-success fw-bold">Registro de Usuarios</h5>
                     <p class="card-text">
-                        Permite dar de alta nuevos usuarios mediante un formulario accesible desde la aplicación.
-                        Los datos se almacenan directamente en <strong>MariaDB</strong> utilizando <strong>SQLAlchemy</strong>.
-                        Este módulo sustituye la creación automática de usuarios desde el código, aportando una gestión real y persistente.
+                        Permite dar de alta nuevos usuarios con nombre, correo, rol y contraseña segura.
+                        Los datos se almacenan directamente en <strong>MariaDB</strong> usando <strong>SQLAlchemy</strong>.
+                        La columna <code>password_hash</code> asegura que las contraseñas nunca se guarden en texto plano,
+                        garantizando seguridad y persistencia real.
                     </p>
                     <a href="/registro" class="btn btn-outline-success btn-sm">Ir al registro</a>
                 </div>
@@ -29,11 +30,11 @@
         <div class="col">
             <div class="card h-100 shadow-sm border-0">
                 <div class="card-body text-center">
-                    <h5 class="card-title text-primary fw-bold">Login</h5>
+                    <h5 class="card-title text-primary fw-bold">Login Seguro</h5>
                     <p class="card-text">
-                        Permite a los usuarios autenticarse utilizando las credenciales registradas en la base de datos <strong>MariaDB</strong>.
-                        El sistema valida los datos introducidos y muestra un mensaje de bienvenida con el rol correspondiente.
-                        Está diseñado para ampliarse con contraseñas cifradas y sesiones seguras mediante <strong>Flask-Login</strong>.
+                        Permite a los usuarios autenticarse con nombre, correo y contraseña.
+                        Las credenciales se validan contra <strong>MariaDB</strong> usando hashing seguro.
+                        El sistema muestra un mensaje de bienvenida con el rol del usuario y mantiene sesiones seguras.
                     </p>
                     <a href="/login" class="btn btn-outline-primary btn-sm">Iniciar sesión</a>
                 </div>
@@ -46,9 +47,8 @@
                 <div class="card-body text-center">
                     <h5 class="card-title text-info fw-bold">Estadísticas</h5>
                     <p class="card-text">
-                        Permite visualizar métricas clave sobre los usuarios registrados, incluyendo la distribución de roles.
-                        Los gráficos se generan dinámicamente con <strong>Matplotlib</strong> y se integran directamente en la vista HTML
-                        en formato <em>base64</em>, sin crear archivos temporales.
+                        Visualiza métricas clave de los usuarios, incluyendo la distribución de roles.
+                        Los gráficos se generan dinámicamente con <strong>Matplotlib</strong> y se integran en la vista en formato <em>base64</em>.
                     </p>
                     <a href="/estadisticas" class="btn btn-outline-info btn-sm">Ver estadísticas</a>
                 </div>
@@ -61,9 +61,9 @@
                 <div class="card-body text-center">
                     <h5 class="card-title text-secondary fw-bold">Funciones</h5>
                     <p class="card-text">
-                        Detalla las funcionalidades principales de la aplicación: gestión de usuarios reales en <strong>MariaDB</strong>,
-                        registro manual, autenticación básica, generación de estadísticas dinámicas y despliegue automatizado mediante
-                        <strong>Docker</strong> y <strong>Jenkins</strong>.
+                        Describe las funcionalidades principales: registro manual de usuarios con contraseña segura,
+                        autenticación, generación de estadísticas dinámicas y despliegue automatizado con <strong>Docker</strong> y <strong>Jenkins</strong>.
+                        Los tests automatizados comprueban estos flujos garantizando calidad y seguridad.
                     </p>
                     <a href="/funciones" class="btn btn-outline-secondary btn-sm">Ver funciones</a>
                 </div>
@@ -76,9 +76,8 @@
                 <div class="card-body text-center">
                     <h5 class="card-title text-warning fw-bold">Documentación</h5>
                     <p class="card-text">
-                        Explica la estructura del proyecto, las dependencias y el pipeline de integración continua completo.
-                        Incluye la configuración del <strong>Dockerfile</strong>, el <strong>Jenkinsfile</strong> y la integración con
-                        <strong>SonarQube</strong> para el análisis de calidad del código antes del despliegue.
+                        Explica la estructura del proyecto, dependencias, pipeline CI/CD y análisis de calidad con <strong>SonarQube</strong>.
+                        Incluye la integración de tests para login y registro con contraseñas seguras.
                     </p>
                     <a href="/documentacion" class="btn btn-outline-warning btn-sm">Ver documentación</a>
                 </div>
@@ -91,15 +90,14 @@
         <h4 class="text-secondary text-center mb-3">Infraestructura del Proyecto</h4>
         <div class="card shadow-sm border-0 p-4">
             <ul class="list-unstyled mb-0">
-                <li><strong>debianserver:</strong> Máquina principal que ejecuta <strong>Jenkins</strong> para la automatización del pipeline CI/CD.</li>
-                <li><strong>debianagent:</strong> Nodo agente de Jenkins encargado de construir la imagen Docker y ejecutar las pruebas.</li>
-                <li><strong>sonarqube (192.168.56.104):</strong> Servidor de análisis estático del código y métricas de calidad.</li>
-                <li><strong>debianMariaDB (192.168.56.105):</strong> Servidor de base de datos <strong>MariaDB</strong> utilizado por la aplicación Flask para almacenar usuarios.</li>
-                <li><strong>debianWordpress (192.168.56.106):</strong> Servidor remoto donde se despliega la aplicación Flask en contenedor Docker.</li>
+                <li><strong>debianserver:</strong> Máquina principal con <strong>Jenkins</strong> para automatización del pipeline CI/CD.</li>
+                <li><strong>debianagent:</strong> Nodo agente que construye la imagen Docker y ejecuta pruebas automatizadas.</li>
+                <li><strong>sonarqube (192.168.56.104):</strong> Servidor de análisis de calidad de código y métricas.</li>
+                <li><strong>debianMariaDB (192.168.56.105):</strong> Base de datos <strong>MariaDB</strong> con la tabla de usuarios actualizada incluyendo <code>password_hash</code>.</li>
+                <li><strong>debianWordpress (192.168.56.106):</strong> Servidor remoto donde se despliega la app Flask en Docker.</li>
             </ul>
             <p class="mt-3 mb-0 text-muted">
-                Todos los componentes operan en una red privada (<code>192.168.56.x</code>), garantizando comunicación interna
-                segura, controlada y eficiente entre los distintos servicios del entorno DevOps.
+                Todos los componentes operan en una red privada (<code>192.168.56.x</code>), garantizando comunicación interna segura y eficiente.
             </p>
         </div>
     </div>

@@ -5,45 +5,50 @@
     <h2 class="text-success mb-4">Funciones Disponibles</h2>
 
     <p>
-        Esta sección describe las principales funcionalidades implementadas en la aplicación <strong>Flask App Real</strong>,
-        así como su integración dentro del flujo completo de desarrollo, despliegue y automatización del sistema.
+        Esta sección describe las principales funcionalidades de la aplicación <strong>Flask App Real</strong>,
+        destacando su integración en un flujo completo de desarrollo, despliegue y automatización del sistema.
         La aplicación combina tecnologías modernas como <strong>Flask</strong>, <strong>MariaDB</strong>, <strong>Docker</strong> y <strong>Jenkins</strong>
         para demostrar un entorno DevOps totalmente funcional y profesional.
     </p>
 
     <h4 class="mt-4 text-secondary">Gestión de Usuarios</h4>
     <p>
-        La aplicación implementa un modelo de datos <code>Usuario</code> gestionado mediante <strong>SQLAlchemy</strong> y almacenado en una base de datos real <strong>MariaDB</strong>.
-        Cada usuario tiene un nombre, correo electrónico y rol asignado, lo que permite una gestión estructurada y persistente de los datos.
+        La aplicación implementa un modelo de datos <code>Usuario</code> gestionado mediante <strong>SQLAlchemy</strong> y almacenado en <strong>MariaDB</strong>.
+        Cada usuario tiene nombre, correo electrónico, rol y contraseña (almacenada de forma segura en la columna <code>password_hash</code>).
         Los usuarios pueden darse de alta manualmente desde la sección <a href="{{ url_for('registro_get') }}">Registrar usuario</a>,
-        y todos los registros se almacenan automáticamente en la base de datos, eliminando la generación de usuarios aleatorios desde el código.
+        y todos los registros se guardan directamente en la base de datos, asegurando integridad y persistencia.
     </p>
 
-    <h4 class="mt-4 text-secondary">Inicio de Sesión (Login)</h4>
+    <h4 class="mt-4 text-secondary">Inicio de Sesión (Login) Seguro</h4>
     <p>
-        Se ha incorporado un sistema de <strong>autenticación básica</strong> que permite iniciar sesión con las credenciales almacenadas en la base de datos.
-        Desde la pestaña <a href="{{ url_for('login_get') }}">Login</a>, los usuarios pueden acceder introduciendo su nombre y correo electrónico.
-        El sistema valida los datos en <strong>MariaDB</strong> y muestra un mensaje de bienvenida personalizado con su rol.
+        Se ha incorporado un sistema de <strong>autenticación segura</strong> que permite iniciar sesión usando nombre, correo electrónico y contraseña.
+        Las credenciales se validan contra <strong>MariaDB</strong> usando <strong>hashing de contraseñas</strong> con <code>Werkzeug</code>,
+        evitando almacenar contraseñas en texto plano. El sistema muestra un mensaje de bienvenida personalizado con el rol del usuario.
     </p>
 
     <h4 class="mt-4 text-secondary">Generación de Estadísticas</h4>
     <p>
         La aplicación incluye una sección de estadísticas que utiliza <strong>Matplotlib</strong> para generar gráficos dinámicos de distribución de roles.
-        Las imágenes se convierten a formato <em>base64</em> para ser renderizadas directamente en la interfaz sin crear archivos físicos.
-        Este enfoque proporciona visualizaciones rápidas y ligeras sobre el número de usuarios por rol y su evolución en el sistema.
+        Las imágenes se convierten a formato <em>base64</em> para ser renderizadas directamente en la interfaz, proporcionando visualizaciones rápidas sobre el número de usuarios por rol y su evolución.
     </p>
 
     <h4 class="mt-4 text-secondary">Exportación y Análisis de Datos</h4>
     <p>
         El sistema está preparado para futuras extensiones que permitirán exportar información de usuarios y métricas en formatos como <strong>CSV</strong> o <strong>PDF</strong>.
-        También admite la integración de módulos de análisis más avanzados para realizar segmentaciones, auditorías o estadísticas de uso directamente desde la base de datos <strong>MariaDB</strong>.
+        También admite la integración de módulos de análisis más avanzados para auditorías o estadísticas de uso directamente desde <strong>MariaDB</strong>.
+    </p>
+
+    <h4 class="mt-4 text-secondary">Pruebas Automatizadas y Calidad de Código</h4>
+    <p>
+        Los tests unitarios ahora incluyen validaciones de login y registro con contraseñas seguras, evitando el uso de valores hard-coded.
+        Esto garantiza que los flujos críticos de autenticación se comprueben automáticamente y cumple con las normas de seguridad de <strong>SonarQube</strong>.
     </p>
 
     <h4 class="mt-4 text-secondary">Configuración y Seguridad</h4>
     <p>
-        La aplicación soporta diferentes configuraciones de entorno (<code>development</code>, <code>testing</code>, <code>production</code>).
-        La conexión con la base de datos se puede gestionar mediante variables de entorno, evitando credenciales en el código fuente.
-        Durante el despliegue, <strong>Jenkins</strong> gestiona estas credenciales de forma segura, mejorando la protección del sistema y permitiendo un flujo de integración continua profesional.
+        La aplicación soporta múltiples entornos (<code>development</code>, <code>testing</code>, <code>production</code>).
+        Las conexiones con la base de datos se gestionan mediante variables de entorno y Jenkins maneja las credenciales de forma segura,
+        evitando exponer contraseñas en el código y mejorando la protección del sistema.
     </p>
 
     <h4 class="mt-4 text-secondary">Despliegue Automatizado</h4>
@@ -53,7 +58,7 @@
     </p>
     <ul>
         <li>Descarga del código fuente desde el repositorio GitHub.</li>
-        <li>Ejecución de tests unitarios y análisis estático del código con <strong>SonarQube</strong>.</li>
+        <li>Ejecución de tests unitarios y análisis de calidad de código con <strong>SonarQube</strong>.</li>
         <li>Construcción de la imagen Docker de la aplicación Flask.</li>
         <li>Verificación automática de conexión con <strong>MariaDB</strong> usando credenciales seguras.</li>
         <li>Despliegue de la imagen en el servidor remoto <code>192.168.56.106</code> y validación del servicio en ejecución.</li>

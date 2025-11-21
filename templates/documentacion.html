@@ -7,57 +7,57 @@
         Esta aplicación está desarrollada con el framework <strong>Flask</strong> en <strong>Python</strong> y forma parte de un entorno
         <strong>DevOps</strong> completamente automatizado. El despliegue se realiza mediante <strong>Docker</strong> y <strong>Jenkins</strong>,
         utilizando una base de datos externa <strong>MariaDB</strong> y un pipeline CI/CD que garantiza calidad, seguridad y continuidad en el servicio.
+        Además, se ha incorporado un sistema de registro y login con contraseña segura almacenada mediante hashing en la columna <code>password_hash</code>.
     </p>
 
     <h4 class="mt-4 text-secondary">Estructura del Proyecto</h4>
     <ul>
-        <li><strong>app.py:</strong> Archivo principal de la aplicación Flask. Configura la conexión con la base de datos MariaDB, define las rutas y gestiona la lógica principal (inicio, registro, login, estadísticas, etc.).</li>
-        <li><strong>models.py:</strong> Contiene el modelo de datos <code>Usuario</code> y la inicialización de SQLAlchemy para la comunicación con la base de datos.</li>
+        <li><strong>app.py:</strong> Archivo principal de la aplicación Flask. Configura la conexión con MariaDB, define rutas y gestiona la lógica principal (inicio, registro con contraseña, login seguro, estadísticas, etc.).</li>
+        <li><strong>models.py:</strong> Contiene el modelo de datos <code>Usuario</code> actualizado con la columna <code>password_hash</code> y la inicialización de SQLAlchemy.</li>
         <li><strong>templates/:</strong> Carpeta con las páginas HTML renderizadas mediante Jinja2 (incluye <code>index.html</code>, <code>registro.html</code>, <code>login.html</code>, etc.).</li>
         <li><strong>static/:</strong> Archivos estáticos como hojas de estilo, imágenes o scripts complementarios.</li>
-        <li><strong>requirements.txt:</strong> Lista de dependencias del proyecto. Incluye <code>Flask</code>, <code>SQLAlchemy</code>, <code>PyMySQL</code> y <code>Matplotlib</code>.</li>
+        <li><strong>requirements.txt:</strong> Lista de dependencias del proyecto, incluyendo <code>Flask</code>, <code>SQLAlchemy</code>, <code>PyMySQL</code> y <code>Matplotlib</code>.</li>
         <li><strong>Dockerfile:</strong> Define la imagen Docker que ejecuta la aplicación Flask en el puerto 80 dentro del contenedor.</li>
-        <li><strong>Jenkinsfile:</strong> Contiene el pipeline completo de integración y despliegue automático.</li>
+        <li><strong>Jenkinsfile:</strong> Contiene el pipeline completo de integración, pruebas automatizadas (incluyendo login y registro) y despliegue continuo.</li>
     </ul>
 
     <h4 class="mt-4 text-secondary">Tecnologías Utilizadas</h4>
     <ul>
-        <li><strong>Flask:</strong> Framework web en Python para el desarrollo rápido de aplicaciones ligeras y modulares.</li>
-        <li><strong>SQLAlchemy:</strong> ORM utilizado para gestionar la comunicación entre Flask y la base de datos.</li>
-        <li><strong>MariaDB:</strong> Base de datos relacional externa, configurada en una máquina virtual independiente (<code>192.168.56.105</code>).</li>
-        <li><strong>PyMySQL:</strong> Controlador que permite la conexión entre Flask y MariaDB.</li>
-        <li><strong>Matplotlib:</strong> Librería empleada para generar los gráficos de estadísticas de roles.</li>
-        <li><strong>Docker:</strong> Permite encapsular la aplicación y sus dependencias en contenedores reproducibles.</li>
-        <li><strong>Jenkins:</strong> Sistema de automatización para la construcción, testeo y despliegue continuo.</li>
-        <li><strong>SonarQube:</strong> Herramienta de análisis de calidad del código e indicadores de seguridad.</li>
+        <li><strong>Flask:</strong> Framework web en Python para aplicaciones ligeras y modulares.</li>
+        <li><strong>SQLAlchemy:</strong> ORM para gestionar la comunicación con MariaDB.</li>
+        <li><strong>MariaDB:</strong> Base de datos relacional externa, configurada en una máquina independiente (<code>192.168.56.105</code>) y con columna <code>password_hash</code> para contraseñas seguras.</li>
+        <li><strong>PyMySQL:</strong> Controlador para la conexión entre Flask y MariaDB.</li>
+        <li><strong>Matplotlib:</strong> Genera los gráficos de estadísticas de roles.</li>
+        <li><strong>Docker:</strong> Encapsula la aplicación y sus dependencias en contenedores reproducibles.</li>
+        <li><strong>Jenkins:</strong> Automatiza la construcción, testeo y despliegue continuo.</li>
+        <li><strong>SonarQube:</strong> Analiza la calidad del código y verifica seguridad.</li>
     </ul>
 
     <h4 class="mt-4 text-secondary">Pipeline de Despliegue Automatizado</h4>
-    <p>El proceso de integración continua se gestiona a través de Jenkins y consta de las siguientes etapas:</p>
+    <p>El pipeline de Jenkins gestiona la integración continua y consta de las siguientes etapas:</p>
     <ol>
         <li>Clonación del repositorio desde GitHub.</li>
-        <li>Ejecución de tests y verificación de dependencias.</li>
-        <li>Análisis estático del código fuente con <strong>SonarQube</strong>.</li>
+        <li>Ejecución de tests unitarios, incluyendo login y registro con contraseñas seguras, y verificación de dependencias.</li>
+        <li>Análisis de código con <strong>SonarQube</strong>.</li>
         <li>Validación del <em>Quality Gate</em> para asegurar la calidad mínima exigida.</li>
-        <li>Construcción de la imagen Docker basada en el <code>Dockerfile</code> del proyecto.</li>
-        <li>Comprobación de la conexión a la base de datos <strong>MariaDB</strong> mediante credenciales seguras almacenadas en Jenkins.</li>
+        <li>Construcción de la imagen Docker según <code>Dockerfile</code>.</li>
+        <li>Comprobación de conexión a la base de datos <strong>MariaDB</strong> usando credenciales seguras gestionadas en Jenkins.</li>
         <li>Despliegue remoto automático en la máquina <strong>debianWordpress</strong> (<code>192.168.56.106</code>).</li>
-        <li>Verificación de disponibilidad del servicio Flask tras el despliegue.</li>
+        <li>Verificación de que la aplicación Flask está en línea tras el despliegue.</li>
     </ol>
 
     <h4 class="mt-4 text-secondary">Configuración de la Base de Datos</h4>
     <p>
-        La aplicación utiliza una base de datos externa <strong>MariaDB</strong> para el almacenamiento de usuarios.
-        La conexión se establece mediante SQLAlchemy con la siguiente cadena:
+        La aplicación utiliza MariaDB para almacenar usuarios con nombre, correo, rol y contraseña segura (almacenada como hash).
+        La conexión se realiza mediante SQLAlchemy con la siguiente cadena:
     </p>
     <pre><code>mysql+pymysql://flaskuser:********@192.168.56.105/miappdb</code></pre>
     <p>
-        Las credenciales están gestionadas de forma segura a través de Jenkins, usando la credencial protegida
-        <code>mariadb-pass</code>. Esto evita exponer contraseñas en el código fuente o en el repositorio.
+        Las credenciales están protegidas mediante Jenkins usando la variable <code>mariadb-pass</code>, evitando exponer contraseñas en el código.
     </p>
 
     <h4 class="mt-4 text-secondary">Ejecución Local</h4>
-    <p>Para ejecutar la aplicación localmente en un entorno de desarrollo:</p>
+    <p>Para ejecutar la aplicación localmente:</p>
     <pre><code>python3 -m venv env
 source env/bin/activate
 pip install -r requirements.txt
@@ -65,12 +65,12 @@ python app.py</code></pre>
     <p>La aplicación estará disponible en: <code>http://localhost:80</code></p>
 
     <h4 class="mt-4 text-secondary">Despliegue con Docker</h4>
-    <p>El proyecto incluye un <code>Dockerfile</code> que permite construir y ejecutar la aplicación en un contenedor. Ejemplo de uso:</p>
+    <p>Ejemplo de construcción y ejecución de la app en contenedor Docker:</p>
     <pre><code>docker build -t miapp-flask .
 docker run -d -p 80:80 miapp-flask</code></pre>
 
     <p class="mt-4">
-        De esta forma, el entorno es completamente portable, reproducible y preparado para integrarse con pipelines de CI/CD profesionales.
+        El entorno es completamente portable, reproducible y listo para integrarse con pipelines de CI/CD que incluyen pruebas de autenticación y seguridad.
     </p>
 </div>
 {% endblock %}
