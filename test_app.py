@@ -5,11 +5,6 @@ from werkzeug.security import generate_password_hash
 import secrets  # Para generar contraseñas dinámicas y evitar hard-coded
 
 # ----------------------------
-# Contraseña de prueba
-# ----------------------------
-TEST_PASSWORD = 'Prueba1234'  # solo para tests de usuarios válidos
-
-# ----------------------------
 # Fixture: cliente de prueba
 # ----------------------------
 @pytest.fixture(scope='module')
@@ -18,15 +13,18 @@ def client():
 
     with app.app_context():
         db.create_all()
-        # Usuario de prueba con contraseña
+        # Usuario de prueba con contraseña generada dinámicamente
         if not Usuario.query.filter_by(email='test@example.com').first():
+            test_password = secrets.token_urlsafe(12)  # Contraseña aleatoria
             db.session.add(Usuario(
                 nombre='TestUser',
                 email='test@example.com',
                 rol='Usuario',
-                password_hash=generate_password_hash(TEST_PASSWORD)
+                password_hash=generate_password_hash(test_password)
             ))
             db.session.commit()
+            # Guardamos la contraseña en el cliente para usarla en tests
+            app.config['TEST_PASSWORD'] = test_password
 
         yield app.test_client()
 
@@ -73,12 +71,13 @@ def test_registro_post_success(client):
 
     resp = client.get('/registro')
     csrf = get_csrf(resp.data.decode())
+    test_password = secrets.token_urlsafe(12)
     data = {
         'nombre': 'UsuarioPrueba',
         'email': 'usuario_prueba@example.com',
         'rol': 'Usuario',
-        'password': TEST_PASSWORD,
-        'confirmar': TEST_PASSWORD,
+        'password': test_password,
+        'confirmar': test_password,
         'csrf_token': csrf
     }
     resp = client.post('/registro', data=data, follow_redirects=True)
@@ -111,10 +110,11 @@ def test_registro_post_missing_fields(client):
 def test_login_post_success(client):
     resp = client.get('/login')
     csrf = get_csrf(resp.data.decode())
+    test_password = app.config['TEST_PASSWORD']  # Tomamos la contraseña generada
     data = {
         'nombre': 'TestUser',
         'email': 'test@example.com',
-        'password': TEST_PASSWORD,
+        'password': test_password,
         'csrf_token': csrf
     }
     resp = client.post('/login', data=data)
@@ -124,10 +124,8 @@ def test_login_post_success(client):
 def test_login_post_user_not_found(client):
     resp = client.get('/login')
     csrf = get_csrf(resp.data.decode())
-
     # Generar contraseña aleatoria para no hard-codear
     random_password = secrets.token_urlsafe(12)
-
     data = {
         'nombre': 'NoExiste',
         'email': 'noexiste@example.com',
@@ -175,5 +173,3 @@ def test_estadisticas_page(client):
     assert resp.status_code == 200
     assert "Total de usuarios" in html
     assert "TestUser" in html
-
-
