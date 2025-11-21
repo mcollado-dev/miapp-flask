@@ -137,8 +137,8 @@ EOF
         stage('Verificar Despliegue') {
             steps {
                 sh """
-                    echo 'Esperando 10 segundos para que el contenedor se inicie...'
-                    sleep 10
+                    echo 'Esperando 20 segundos para que el contenedor se inicie...'
+                    sleep 20
 
                     # Se realizan hasta 90 intentos (≈3 minutos)
                     # para comprobar si la app responde en el puerto 8081
