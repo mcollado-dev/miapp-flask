@@ -4,6 +4,11 @@ import re
 from werkzeug.security import generate_password_hash
 
 # ----------------------------
+# Contraseña de prueba
+# ----------------------------
+TEST_PASSWORD = 'Prueba1234'  # solo para tests, evita hard-coded literals directos
+
+# ----------------------------
 # Fixture: cliente de prueba
 # ----------------------------
 @pytest.fixture(scope='module')
@@ -18,7 +23,7 @@ def client():
                 nombre='TestUser',
                 email='test@example.com',
                 rol='Usuario',
-                password_hash=generate_password_hash('Prueba1234')
+                password_hash=generate_password_hash(TEST_PASSWORD)
             ))
             db.session.commit()
 
@@ -71,8 +76,8 @@ def test_registro_post_success(client):
         'nombre': 'UsuarioPrueba',
         'email': 'usuario_prueba@example.com',
         'rol': 'Usuario',
-        'password': 'Prueba1234',
-        'confirmar': 'Prueba1234',
+        'password': TEST_PASSWORD,
+        'confirmar': TEST_PASSWORD,
         'csrf_token': csrf
     }
     resp = client.post('/registro', data=data, follow_redirects=True)
@@ -108,7 +113,7 @@ def test_login_post_success(client):
     data = {
         'nombre': 'TestUser',
         'email': 'test@example.com',
-        'password': 'Prueba1234',
+        'password': TEST_PASSWORD,
         'csrf_token': csrf
     }
     resp = client.post('/login', data=data)
@@ -165,3 +170,4 @@ def test_estadisticas_page(client):
     assert resp.status_code == 200
     assert "Total de usuarios" in html
     assert "TestUser" in html
+
