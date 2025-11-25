@@ -2,7 +2,6 @@
 # Imagen base ligera de Python (3.11-slim para soportar contourpy==1.3.3)
 # -----------------------------------------------------------
 FROM python:3.11-slim
-# Si quisieras mantener Python 3.10 (más estable y ligera), usarías:
 # FROM python:3.10-slim
 # NOTA: En Python 3.10 contourpy==1.3.3 no está disponible, solo hasta 1.3.2
 
