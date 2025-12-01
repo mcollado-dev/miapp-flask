@@ -182,10 +182,10 @@ Si cualquier fase falla → el pipeline se detiene.
 
 Despliegue al servidor debianWordpress (192.168.56.106) mediante:
 
--docker save miapp-flask:latest | bzip2 | ssh usuario@192.168.56.106 'bunzip2 | docker load'  
--docker stop miapp-flask || true  
--docker rm miapp-flask || true  
--docker run -d --name miapp-flask -p 8081:80 miapp-flask  
+- docker save miapp-flask:latest | bzip2 | ssh usuario@192.168.56.106 'bunzip2 | docker load'  
+- docker stop miapp-flask || true  
+- docker rm miapp-flask || true  
+- docker run -d --name miapp-flask -p 8081:80 miapp-flask  
 
 ---
 
@@ -205,10 +205,13 @@ Se ha integrado Portainer CE para:
 
 ## ▶️ Ejecución Local
 
-python3 -m venv env
-source env/bin/activate
-pip install -r requirements.txt
-python app.py
+python3 -m venv env  
+
+source env/bin/activate  
+
+pip install -r requirements.txt  
+
+python app.py  
 
 
 Acceso: http://localhost:80
