@@ -182,14 +182,10 @@ Si cualquier fase falla → el pipeline se detiene.
 
 Despliegue al servidor debianWordpress (192.168.56.106) mediante:
 
-docker save miapp-flask:latest | bzip2 | ssh usuario@192.168.56.106 'bunzip2 | docker load'  
-
-docker stop miapp-flask || true  
-
-docker rm miapp-flask || true  
-
-docker run -d --name miapp-flask -p 8081:80 miapp-flask  
-
+-docker save miapp-flask:latest | bzip2 | ssh usuario@192.168.56.106 'bunzip2 | docker load'  
+-docker stop miapp-flask || true  
+-docker rm miapp-flask || true  
+-docker run -d --name miapp-flask -p 8081:80 miapp-flask  
 
 ---
 
@@ -221,20 +217,20 @@ Acceso: http://localhost:80
 
 ## 📥 Flujo de trabajo GitHub
 
-- 1.Desarrollo local
+- 1. Desarrollo local
 
-- 2.Commit
+- 2. Commit
 
   - git add .
   - git commit -m "mensaje"
   - git push
 
 
-- 3.Jenkins detecta cambios
+- 3. Jenkins detecta cambios
 
-- 4.Pipeline automático
+- 4. Pipeline automático
 
-- 5.Despliegue sin intervención manual
+- 5. Despliegue sin intervención manual
 
 ---
 
