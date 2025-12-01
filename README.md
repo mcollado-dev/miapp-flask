@@ -66,24 +66,42 @@ Comunicación por red privada **Host-Only (192.168.56.x)**.
 
 ## 📁 Estructura del Proyecto
 
-miapp-flask/
-├── app.py # Aplicación principal Flask
-├── models.py # Modelo de datos SQLAlchemy
-├── test_app.py # Tests unitarios (pytest)
-├── requirements.txt # Dependencias Python
-├── Dockerfile # Imagen Docker
-├── Jenkinsfile # Pipeline CI/CD
-├── templates/ # HTML (Jinja2 + Bootstrap)
-│ ├── base.html
-│ ├── index.html
-│ ├── login.html
-│ ├── registro.html
-│ ├── estadisticas.html
-│ ├── funciones.html
-│ ├── documentacion.html
-│ └── detalles.html
-└── static/
-└── style.css
+miapp-flask/  
+
+├── app.py # Aplicación principal Flask  
+
+├── models.py # Modelo de datos SQLAlchemy  
+
+├── test_app.py # Tests unitarios (pytest)  
+
+├── requirements.txt # Dependencias Python  
+
+├── Dockerfile # Imagen Docker  
+
+├── Jenkinsfile # Pipeline CI/CD  
+
+├── templates/ # HTML (Jinja2 + Bootstrap)  
+
+│ ├── base.html  
+
+│ ├── index.html  
+
+│ ├── login.html  
+
+│ ├── registro.html  
+
+│ ├── estadisticas.html  
+
+│ ├── funciones.html  
+
+│ ├── documentacion.html  
+
+│ └── detalles.html  
+
+└── static/  
+
+└── style.css  
+
 
 
 ---
@@ -203,9 +221,9 @@ Acceso: http://localhost:80
 
 - 2.Commit
 
-- git add .
-- git commit -m "mensaje"
-- git push
+  - git add .
+  - git commit -m "mensaje"
+  - git push
 
 
 - 3.Jenkins detecta cambios
