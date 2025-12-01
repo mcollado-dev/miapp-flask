@@ -132,7 +132,6 @@ La cobertura es enviada automáticamente a **SonarQube**.
 ```bash
 docker build -t miapp-flask .
 docker run -d -p 80:80 miapp-flask
-```bash
 
 ---
 
