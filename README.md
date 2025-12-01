@@ -156,6 +156,7 @@ El pipeline completo ejecuta:
 
 Si cualquier fase falla → el pipeline se detiene.
 
+---
 
 ##📦 Despliegue Automático
 
@@ -166,6 +167,7 @@ docker stop miapp-flask || true
 docker rm miapp-flask || true
 docker run -d --name miapp-flask -p 8081:80 miapp-flask
 
+---
 
 ##📊 Gestión visual con Portainer
 
@@ -179,7 +181,7 @@ Se ha integrado Portainer CE para:
 
 -Monitorización de logs
 
-
+---
 
 ##▶️ Ejecución Local
 
@@ -191,6 +193,7 @@ python app.py
 
 Acceso: http://localhost:80
 
+---
 
 ##📥 Flujo de trabajo GitHub
 
@@ -209,6 +212,7 @@ git push
 
 - 5.Despliegue sin intervención manual
 
+---
 
 ##🎓 Conclusiones
 
@@ -232,7 +236,10 @@ Este proyecto demuestra dominio en:
 
 La solución es escalable, mantenible y alineada con estándares profesionales, válida como base para proyectos productivos reales.
 
+---
+
 ##📜 Licencia
 
 Este proyecto forma parte del Trabajo de Fin de FCT — ASIR 2024/2025.
 Uso educativo y demostrativo.
+---
