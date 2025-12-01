@@ -136,31 +136,31 @@ docker run -d -p 80:80 miapp-flask
 
 ---
 
-##🔄 Pipeline CI/CD de Jenkins
+## 🔄 Pipeline CI/CD de Jenkins
 
 El pipeline completo ejecuta:
 
--✅ Checkout desde GitHub
+- ✅ Checkout desde GitHub
 
--🧪 Ejecución de Tests + Coverage
+- 🧪 Ejecución de Tests + Coverage
 
--🔍 Análisis estático con SonarQube
+- 🔍 Análisis estático con SonarQube
 
--✅ Validación Quality Gate
+- ✅ Validación Quality Gate
 
--🐳 Build de imagen Docker
+- 🐳 Build de imagen Docker
 
--💾 Verificación conexión a MariaDB
+- 💾 Verificación conexión a MariaDB
 
--🚀 Deploy remoto automático
+- 🚀 Deploy remoto automático
 
--✅ Verificación de servicio activo
+- ✅ Verificación de servicio activo
 
 Si cualquier fase falla → el pipeline se detiene.
 
 ---
 
-##📦 Despliegue Automático
+## 📦 Despliegue Automático
 
 Despliegue al servidor debianWordpress (192.168.56.106) mediante:
 
@@ -171,21 +171,21 @@ docker run -d --name miapp-flask -p 8081:80 miapp-flask
 
 ---
 
-##📊 Gestión visual con Portainer
+## 📊 Gestión visual con Portainer
 
 Se ha integrado Portainer CE para:
 
--Visualización de contenedores activos
+- Visualización de contenedores activos
 
--Gestión de imágenes Docker
+- Gestión de imágenes Docker
 
--Administración de redes y volúmenes
+- Administración de redes y volúmenes
 
--Monitorización de logs
+- Monitorización de logs
 
 ---
 
-##▶️ Ejecución Local
+## ▶️ Ejecución Local
 
 python3 -m venv env
 source env/bin/activate
@@ -197,15 +197,15 @@ Acceso: http://localhost:80
 
 ---
 
-##📥 Flujo de trabajo GitHub
+## 📥 Flujo de trabajo GitHub
 
 - 1.Desarrollo local
 
 - 2.Commit
 
-git add .
-git commit -m "mensaje"
-git push
+- git add .
+- git commit -m "mensaje"
+- git push
 
 
 - 3.Jenkins detecta cambios
@@ -216,32 +216,33 @@ git push
 
 ---
 
-##🎓 Conclusiones
+## 🎓 Conclusiones
 
 Este proyecto demuestra dominio en:
 
--Desarrollo web profesional con Flask
+- Desarrollo web profesional con Flask
 
--Automatización DevOps completa
+- Automatización DevOps completa
 
--Arquitecturas distribuidas
+- Arquitecturas distribuidas
 
--Control de calidad de código
+- Control de calidad de código
 
--Seguridad en aplicaciones web
+- Seguridad en aplicaciones web
 
--Gestión de bases de datos
+- Gestión de bases de datos
 
--Docker & Jenkins
+- Docker & Jenkins
 
--Entornos reales CI/CD
+- Entornos reales CI/CD
 
 La solución es escalable, mantenible y alineada con estándares profesionales, válida como base para proyectos productivos reales.
 
 ---
 
-##📜 Licencia
+## 📜 Licencia
 
 Este proyecto forma parte del Trabajo de Fin de FCT — ASIR 2024/2025.
 Uso educativo y demostrativo.
+
 ---
